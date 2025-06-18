@@ -15,13 +15,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorItem.Type;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.wurstclient.Category;
@@ -121,7 +118,7 @@ public final class AutoArmorHack extends Hack
 		for(int slot = 0; slot < 36; slot++)
 		{
 			ItemStack stack = inventory.getStack(slot);
-			
+
 			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
 				continue;
 			
@@ -182,11 +179,10 @@ public final class AutoArmorHack extends Hack
 	public boolean isWorseOrSameArmor(ItemStack candidate)
 	{
 		// If candidate is not armor
-		if(!(candidate.getItem() instanceof ArmorItem))
+		if(!(candidate.getItem() instanceof ArmorItem candidateItem))
 			return false;
-		
-		ArmorItem candidateItem = (ArmorItem)candidate.getItem();
-		var slot = candidateItem.getSlotType();
+
+        var slot = candidateItem.getSlotType();
 		var player = MinecraftClient.getInstance().player;
 		if(player == null)
 			return false;
@@ -198,39 +194,36 @@ public final class AutoArmorHack extends Hack
 			return false;
 		
 		// If equipped not an armor
-		if(!(equipped.getItem() instanceof ArmorItem))
+		if(!(equipped.getItem() instanceof ArmorItem equippedItem))
 			return false;
-		
-		int candidateValue = getArmorValue(candidateItem, candidate);
-		int equippedValue = getArmorValue((ArmorItem)equipped.getItem(), equipped);
-		
+
+        int candidateValue = getArmorValue(candidateItem, candidate);
+		int equippedValue = getArmorValue(equippedItem, equipped);
 		return candidateValue <= equippedValue;
 	}
 	
+	private int getArmorValue(ArmorItem item, ItemStack stack)
+	{
+		int baseProtection = item.getProtection();
+		int enchantmentBonus = 0;
+		if (useEnchantments.isChecked())
+		{
+			// System.out.println(EnchantmentHelper.getLevel(Enchantments.BLAST_PROTECTION, stack));
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.PROTECTION, stack) * 3;
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.BLAST_PROTECTION, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.FIRE_PROTECTION, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.PROJECTILE_PROTECTION, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.THORNS, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
+		}
+		return baseProtection * 5 + enchantmentBonus;
+	}
+
 	@Override
 	public void onSentPacket(PacketOutputEvent event)
 	{
 		if(event.getPacket() instanceof ClickSlotC2SPacket)
 			timer = delay.getValueI();
-	}
-	
-	private int getArmorValue(ArmorItem item, ItemStack stack)
-	{
-		int armorPoints = item.getProtection();
-		int prtPoints = 0;
-		int armorToughness = (int)item.toughness;
-		int armorType = item.getMaterial().getProtection(Type.LEGGINGS);
-		
-		if(useEnchantments.isChecked())
-		{
-			Enchantment protection = Enchantments.PROTECTION;
-			int prtLvl = EnchantmentHelper.getLevel(protection, stack);
-			
-			ClientPlayerEntity player = MC.player;
-			DamageSource dmgSource = player.getDamageSources().playerAttack(player);
-			prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
-		}
-		
-		return armorPoints * 5 + prtPoints * 3 + armorToughness + armorType;
 	}
 }
