@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -162,6 +163,48 @@ public final class AutoArmorHack extends Hack
 			
 			break;
 		}
+		
+		for(int slot = 9; slot < 45; slot++)
+		{
+			int adjustedSlot = slot;
+			if(adjustedSlot >= 36)
+				adjustedSlot -= 36;
+			ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
+			
+			if(!stack.isEmpty())
+			{
+				if(isWorseOrSameArmor(stack))
+					IMC.getInteractionManager().windowClick_THROW(slot);
+			}
+		}
+	}
+
+	public boolean isWorseOrSameArmor(ItemStack candidate)
+	{
+		// If candidate is not armor
+		if(!(candidate.getItem() instanceof ArmorItem))
+			return false;
+		
+		ArmorItem candidateItem = (ArmorItem)candidate.getItem();
+		var slot = candidateItem.getSlotType();
+		var player = MinecraftClient.getInstance().player;
+		if(player == null)
+			return false;
+		
+		ItemStack equipped = player.getEquippedStack(slot);
+		
+		// If nothing is equipped
+		if(equipped.isEmpty())
+			return false;
+		
+		// If equipped not an armor
+		if(!(equipped.getItem() instanceof ArmorItem))
+			return false;
+		
+		int candidateValue = getArmorValue(candidateItem, candidate);
+		int equippedValue = getArmorValue((ArmorItem)equipped.getItem(), equipped);
+		
+		return candidateValue <= equippedValue;
 	}
 	
 	@Override
@@ -184,8 +227,7 @@ public final class AutoArmorHack extends Hack
 			int prtLvl = EnchantmentHelper.getLevel(protection, stack);
 			
 			ClientPlayerEntity player = MC.player;
-			DamageSource dmgSource =
-				player.getDamageSources().playerAttack(player);
+			DamageSource dmgSource = player.getDamageSources().playerAttack(player);
 			prtPoints = protection.getProtectionAmount(prtLvl, dmgSource);
 		}
 		

@@ -34,6 +34,8 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	
 	private final String renderName =
 		Math.random() < 0.01 ? "AutoLinus" : getName();
+
+	private boolean isDropped = false;
 	
 	public AutoDropHack()
 	{
@@ -59,6 +61,20 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	{
 		EVENTS.remove(UpdateListener.class, this);
 	}
+
+	@Override
+	public void setEnabled(boolean enabled)
+	{
+		if (enabled) {
+			super.setEnabled(true);
+		}
+		else {
+			if (isDropped) {
+				isDropped = false;
+				super.setEnabled(false);
+			}
+		}
+	}
 	
 	@Override
 	public void onUpdate()
@@ -68,6 +84,10 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
 		
+		if(MC.player.input.movementForward != 0
+			|| MC.player.input.movementSideways != 0)
+			return;
+
 		for(int slot = 9; slot < 45; slot++)
 		{
 			int adjustedSlot = slot;
@@ -83,8 +103,11 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			
 			if(!items.getItemNames().contains(itemName))
 				continue;
-			
+
 			IMC.getInteractionManager().windowClick_THROW(slot);
 		}
+
+		isDropped = true;
+		this.setEnabled(false);
 	}
 }
