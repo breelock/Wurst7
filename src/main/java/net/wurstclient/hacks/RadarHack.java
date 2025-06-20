@@ -7,16 +7,15 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.clickgui.Window;
@@ -29,6 +28,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.*;
 import net.wurstclient.util.FakePlayerEntity;
+import org.jetbrains.annotations.NotNull;
 
 @SearchTags({"MiniMap", "mini map"})
 public final class RadarHack extends Hack implements UpdateListener
@@ -50,6 +50,9 @@ public final class RadarHack extends Hack implements UpdateListener
 			FilterBatsSetting.genericVision(true),
 			FilterSlimesSetting.genericVision(false),
 			FilterInvisibleSetting.genericVision(false));
+
+	private final CheckboxSetting onlyPlayers = new CheckboxSetting("Show only players",
+			"Show only players", false);
 	
 	public RadarHack()
 	{
@@ -58,6 +61,7 @@ public final class RadarHack extends Hack implements UpdateListener
 		setCategory(Category.RENDER);
 		addSetting(radius);
 		addSetting(rotate);
+		addSetting(onlyPlayers);
 		entityFilters.forEach(this::addSetting);
 		
 		window = new Window("Radar");
@@ -87,14 +91,29 @@ public final class RadarHack extends Hack implements UpdateListener
 		ClientWorld world = MC.world;
 		
 		entities.clear();
-		Stream<Entity> stream =
-			StreamSupport.stream(world.getEntities().spliterator(), true)
-				.filter(e -> !e.isRemoved() && e != player)
-				.filter(e -> !(e instanceof FakePlayerEntity))
-				.filter(LivingEntity.class::isInstance)
-				.filter(e -> ((LivingEntity)e).getHealth() > 0);
-		
-		stream = entityFilters.applyTo(stream);
+		Stream<Entity> stream;
+
+		if (onlyPlayers.isChecked()) {
+			stream = StreamSupport.stream(world.getEntities().spliterator(), true)
+					.filter(e -> e instanceof PlayerEntity)
+					.filter(e -> {
+                        PlayerEntity p = (PlayerEntity) e;
+                        return p.getHealth() > 0;
+                    })
+					.filter(e -> !e.isRemoved())
+					.filter(e -> e != MC.player)
+					.filter(e -> !(e instanceof FakePlayerEntity))
+					.filter(e -> Math.abs(e.getY() - MC.player.getY()) <= 1e6);
+		}
+		else {
+			stream = StreamSupport.stream(world.getEntities().spliterator(), true)
+					.filter(e -> !e.isRemoved() && e != player)
+					.filter(e -> !(e instanceof FakePlayerEntity))
+					.filter(LivingEntity.class::isInstance)
+					.filter(e -> ((LivingEntity)e).getHealth() > 0);
+
+			stream = entityFilters.applyTo(stream);
+		}
 		
 		entities.addAll(stream.collect(Collectors.toList()));
 	}

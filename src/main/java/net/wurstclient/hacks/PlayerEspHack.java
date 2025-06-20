@@ -23,9 +23,11 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
 import net.wurstclient.settings.EspStyleSetting.EspStyle;
+import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
@@ -41,6 +43,9 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 {
 	private final EspStyleSetting style =
 		new EspStyleSetting(EspStyle.LINES_AND_BOXES);
+
+	private final CheckboxSetting alwaysGreen = new CheckboxSetting("Always green color",
+			"Always green color", true);
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
@@ -58,6 +63,7 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		setCategory(Category.RENDER);
 		addSetting(style);
 		addSetting(boxSize);
+		addSetting(alwaysGreen);
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -137,11 +143,19 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	{
 		if(WURST.getFriends().contains(e.getName().getString()))
 			return 0x800000FF;
-		
-		float f = MC.player.distanceTo(e) / 20F;
-		float r = MathHelper.clamp(2 - f, 0, 1);
-		float g = MathHelper.clamp(f, 0, 1);
-		float[] rgb = {r, g, 0};
+
+		float[] rgb;
+		if (alwaysGreen.isChecked()) {
+			rgb = new float[] {0, 255, 0};
+		}
+		else {
+			float f = MC.player.distanceTo(e) / 20F;
+			float r = MathHelper.clamp(2 - f, 0, 1);
+			float g = MathHelper.clamp(f, 0, 1);
+
+			rgb = new float[] {r, g, 0};
+		}
+
 		return RenderUtils.toIntColor(rgb, 0.5F);
 	}
 }
