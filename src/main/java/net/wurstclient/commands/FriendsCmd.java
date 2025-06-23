@@ -29,7 +29,7 @@ public class FriendsCmd extends Command
 	public FriendsCmd()
 	{
 		super("friends", "Manages your friends list.", ".friends add <name>",
-			".friends remove <name>", ".friends remove-all",
+			".friends remove <name>", ".friends clear",
 			".friends list [<page>]");
 		
 		addSetting(middleClickFriends);
@@ -51,7 +51,7 @@ public class FriendsCmd extends Command
 			remove(args);
 			break;
 			
-			case "remove-all":
+			case "clear":
 			removeAll(args);
 			break;
 			
@@ -63,7 +63,7 @@ public class FriendsCmd extends Command
 			throw new CmdSyntaxError();
 		}
 	}
-	
+
 	private void add(String[] args) throws CmdException
 	{
 		if(args.length != 2)

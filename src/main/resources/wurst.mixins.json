@@ -40,6 +40,7 @@
     "HeldItemRendererMixin",
     "IngameHudMixin",
     "InGameOverlayRendererMixin",
+    "GetScreenTitleMixin",
     "KeyBindingMixin",
     "KeyboardMixin",
     "LanguageManagerMixin",
