@@ -29,11 +29,19 @@ public final class AutoYLeaveHack extends Hack implements UpdateListener
 		"Leaves the server when the Y-axis reaches this value or falls below it.",
 		-60, -100, 500, 1, ValueDisplay.DECIMAL);
 
+	private final SliderSetting delay = new SliderSetting("Delay between commands",
+			"Delay between sending /next command in ms",
+			322, 0, 500, 1, ValueDisplay.DECIMAL);
+
+	private final CheckboxSetting checkWater = new CheckboxSetting("Check water", "Don't leave if player in water", true);
+
 	public AutoYLeaveHack()
 	{
 		super("AutoYLeave");
 		setCategory(Category.COMBAT);
 		addSetting(yAxis);
+		addSetting(delay);
+		addSetting(checkWater);
 	}
 	
 	@Override
@@ -57,7 +65,7 @@ public final class AutoYLeaveHack extends Hack implements UpdateListener
 			return;
 
 		// check if player in water
-		if (MC.player.isTouchingWater())
+		if (checkWater.isChecked() && MC.player.isTouchingWater())
 			return;
 
 		// check Y-Axis
@@ -76,7 +84,7 @@ public final class AutoYLeaveHack extends Hack implements UpdateListener
 		new Thread(() -> {
 			try {
 				MC.player.networkHandler.sendChatMessage("/next");
-				Thread.sleep(322);
+				Thread.sleep(delay.getValueI());
 				MC.player.networkHandler.sendChatMessage("/next");
 			}
 			catch (InterruptedException e) {

@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "id": "wurst",
   "version": "${version}",
-  "name": "Wurst Client",
-  "description": "Wurst Wurst Wurst!",
+  "name": "Wurst Client Enhanced",
+  "description": "Wurst Wurst Wurst!\nEnhanced by breelock",
   "authors": [
-    "Alexander01998"
+    "Alexander01998", "breelock"
   ],
   "contact": {
     "homepage": "https://www.wurstclient.net/modmenu-homepage/",
-    "sources": "https://www.wurstclient.net/modmenu-sources/",
+    "sources": "https://github.com/breelock/Wurst7",
     "issues": "https://www.wurstclient.net/modmenu-issues/"
   },
   "license": "GPL-3.0-or-later",

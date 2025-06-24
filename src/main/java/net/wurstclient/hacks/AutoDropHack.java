@@ -16,13 +16,14 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ItemListSetting;
 
 @SearchTags({"auto drop", "AutoEject", "auto-eject", "auto eject",
 	"InventoryCleaner", "inventory cleaner", "InvCleaner", "inv cleaner"})
 public final class AutoDropHack extends Hack implements UpdateListener
 {
-	private ItemListSetting items = new ItemListSetting("Items",
+	public ItemListSetting items = new ItemListSetting("Items",
 		"Unwanted items that will be dropped.", "minecraft:allium",
 		"minecraft:azure_bluet", "minecraft:blue_orchid",
 		"minecraft:cornflower", "minecraft:dandelion", "minecraft:lilac",
@@ -31,7 +32,9 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		"minecraft:poisonous_potato", "minecraft:poppy", "minecraft:red_tulip",
 		"minecraft:rose_bush", "minecraft:rotten_flesh", "minecraft:sunflower",
 		"minecraft:wheat_seeds", "minecraft:white_tulip");
-	
+
+	private final CheckboxSetting disableAfterDrop = new CheckboxSetting("Disable after drop", "Disable after drop", true);
+
 	private final String renderName =
 		Math.random() < 0.01 ? "AutoLinus" : getName();
 
@@ -42,6 +45,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		super("AutoDrop");
 		setCategory(Category.ITEMS);
 		addSetting(items);
+		addSetting(disableAfterDrop);
 	}
 	
 	@Override
@@ -69,8 +73,13 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			super.setEnabled(true);
 		}
 		else {
-			if (isDropped) {
-				isDropped = false;
+			if (disableAfterDrop.isChecked()) {
+				if (isDropped) {
+					isDropped = false;
+					super.setEnabled(false);
+				}
+			}
+			else {
 				super.setEnabled(false);
 			}
 		}
@@ -107,7 +116,9 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			IMC.getInteractionManager().windowClick_THROW(slot);
 		}
 
-		isDropped = true;
-		this.setEnabled(false);
+		if (disableAfterDrop.isChecked()) {
+			isDropped = true;
+			this.setEnabled(false);
+		}
 	}
 }

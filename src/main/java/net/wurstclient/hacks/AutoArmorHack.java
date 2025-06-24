@@ -48,6 +48,8 @@ public final class AutoArmorHack extends Hack
 	private final SliderSetting delay = new SliderSetting("Delay",
 		"Amount of ticks to wait before swapping the next piece of armor.", 2,
 		0, 20, 1, ValueDisplay.INTEGER);
+
+	private final CheckboxSetting dropArmor = new CheckboxSetting("Drop armor", "Throw away the worst armor", true);
 	
 	private int timer;
 	
@@ -58,6 +60,7 @@ public final class AutoArmorHack extends Hack
 		addSetting(useEnchantments);
 		addSetting(swapWhileMoving);
 		addSetting(delay);
+		addSetting(dropArmor);
 	}
 	
 	@Override
@@ -160,18 +163,22 @@ public final class AutoArmorHack extends Hack
 			
 			break;
 		}
-		
-		for(int slot = 9; slot < 45; slot++)
+
+		// Throw away the worst armor
+		if (dropArmor.isChecked())
 		{
-			int adjustedSlot = slot;
-			if(adjustedSlot >= 36)
-				adjustedSlot -= 36;
-			ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
-			
-			if(!stack.isEmpty())
+			for(int slot = 9; slot < 45; slot++)
 			{
-				if(isWorseOrSameArmor(stack))
-					IMC.getInteractionManager().windowClick_THROW(slot);
+				int adjustedSlot = slot;
+				if(adjustedSlot >= 36)
+					adjustedSlot -= 36;
+				ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
+
+				if(!stack.isEmpty())
+				{
+					if(isWorseOrSameArmor(stack))
+						IMC.getInteractionManager().windowClick_THROW(slot);
+				}
 			}
 		}
 	}
@@ -202,13 +209,12 @@ public final class AutoArmorHack extends Hack
 		return candidateValue <= equippedValue;
 	}
 	
-	private int getArmorValue(ArmorItem item, ItemStack stack)
+	public int getArmorValue(ArmorItem item, ItemStack stack)
 	{
 		int baseProtection = item.getProtection();
 		int enchantmentBonus = 0;
 		if (useEnchantments.isChecked())
 		{
-			// System.out.println(EnchantmentHelper.getLevel(Enchantments.BLAST_PROTECTION, stack));
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.PROTECTION, stack) * 3;
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.BLAST_PROTECTION, stack);
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.FEATHER_FALLING, stack);
@@ -216,6 +222,7 @@ public final class AutoArmorHack extends Hack
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.PROJECTILE_PROTECTION, stack);
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.THORNS, stack);
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
+			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
 		}
 		return baseProtection * 5 + enchantmentBonus;
 	}

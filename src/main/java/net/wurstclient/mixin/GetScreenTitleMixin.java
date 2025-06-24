@@ -18,7 +18,7 @@ public abstract class GetScreenTitleMixin {
 	@Inject(method = "onTitle", at = @At("HEAD"))
 	public void onTitle(TitleS2CPacket packet, CallbackInfo ci) {
 		Text text = packet.getTitle();
-		if (h.isEnabled() && text != null && text.getString().toLowerCase().contains("1")) {
+		if (h.isEnabled() && text != null && text.getString().toLowerCase().trim().equals("1")) {
 			if (!detected) {
 				detected = true;
 				h.trigger();

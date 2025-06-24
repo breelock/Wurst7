@@ -57,6 +57,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			10, 1, 200, 1,
 			ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 
+	private final CheckboxSetting dropSwords = new CheckboxSetting("Drop swords", "Throw away the worst swords", true);
+
 	private int oldSlot;
 	private int timer;
 	
@@ -64,8 +66,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 	{
 		super("AutoSword");
 		setCategory(Category.COMBAT);
+		addSetting(swapWhileMoving);
 		addSetting(delay);
 		addSetting(releaseTime);
+		addSetting(dropSwords);
 	}
 	
 	@Override
@@ -145,13 +149,17 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 					player.currentScreenHandler.getSlot(36).getStack(), stackMap));
 		} while (false);
 
-		for (int slot = 9; slot < 45; slot++) {
-			int adjusted = slot >= 36 ? slot - 36 : slot;
-			if (adjusted == 0) continue;
-			ItemStack stack = inventory.getStack(adjusted);
+		// Throw away the worst swords
+		if (dropSwords.isChecked())
+		{
+			for (int slot = 9; slot < 45; slot++) {
+				int adjusted = slot >= 36 ? slot - 36 : slot;
+				if (adjusted == 0) continue;
+				ItemStack stack = inventory.getStack(adjusted);
 
-			if (!stack.isEmpty() && isWorseOrSameSword(stack)) {
-				IMC.getInteractionManager().windowClick_THROW(slot);
+				if (!stack.isEmpty() && isWorseOrSameSword(stack)) {
+					IMC.getInteractionManager().windowClick_THROW(slot);
+				}
 			}
 		}
 	}
@@ -190,6 +198,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack);
 		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.FIRE_ASPECT, stack);
 		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.KNOCKBACK, stack);
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
 
 		return dmg * 5 + enchantmentBonus;
 	}

@@ -7,8 +7,12 @@
  */
 package net.wurstclient.commands;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
+import com.google.gson.JsonArray;
 import net.wurstclient.command.CmdError;
 import net.wurstclient.command.CmdException;
 import net.wurstclient.command.CmdSyntaxError;
@@ -16,21 +20,23 @@ import net.wurstclient.command.Command;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.util.ChatUtils;
 import net.wurstclient.util.MathUtils;
+import net.wurstclient.util.json.JsonException;
+import net.wurstclient.util.json.JsonUtils;
 
 public class FriendsCmd extends Command
 {
 	private static final int FRIENDS_PER_PAGE = 8;
 	
 	private final CheckboxSetting middleClickFriends =
-		new CheckboxSetting("Middle click friends",
-			"Add/remove friends by clicking them with the middle mouse button.",
+		new CheckboxSetting("Middle click frens",
+			"Add/remove fren by clicking them with the middle mouse button.",
 			true);
 	
 	public FriendsCmd()
 	{
-		super("friends", "Manages your friends list.", ".friends add <name>",
-			".friends remove <name>", ".friends clear",
-			".friends list [<page>]");
+		super("frens", "Manages your frens list.", ".frens add <name>",
+			".frens remove <name>", ".frens clear", ".frens clear temp",
+			".frens list [<page>]");
 		
 		addSetting(middleClickFriends);
 	}
@@ -72,10 +78,10 @@ public class FriendsCmd extends Command
 		String name = args[1];
 		if(WURST.getFriends().contains(name))
 			throw new CmdError(
-				"\"" + name + "\" is already in your friends list.");
+				"\"" + name + "\" is already in your frens list.");
 		
 		WURST.getFriends().addAndSave(name);
-		ChatUtils.message("Added friend \"" + name + "\".");
+		ChatUtils.message("Added fren \"" + name + "\".");
 	}
 	
 	private void remove(String[] args) throws CmdException
@@ -85,19 +91,58 @@ public class FriendsCmd extends Command
 		
 		String name = args[1];
 		if(!WURST.getFriends().contains(name))
-			throw new CmdError("\"" + name + "\" is not in your friends list.");
+			throw new CmdError("\"" + name + "\" is not in your frens list.");
 		
 		WURST.getFriends().removeAndSave(name);
-		ChatUtils.message("Removed friend \"" + name + "\".");
+		ChatUtils.message("Removed fren \"" + name + "\".");
 	}
 	
 	private void removeAll(String[] args) throws CmdException
 	{
-		if(args.length > 1)
+		if(args.length > 2)
 			throw new CmdSyntaxError();
-		
-		WURST.getFriends().removeAllAndSave();
-		ChatUtils.message("All friends removed. Oof.");
+
+		if (args.length == 2)
+		{
+			if (args[1].equals("tmp") || args[1].equals("temp") || args[1].equals("teammates"))
+			{
+				TreeSet<String> tempFriends;
+				final Path path = MC.runDirectory.toPath().normalize().resolve("wurst").resolve("tempFriends.json");
+				try { // getting list of temp frens
+					tempFriends = new TreeSet<>(JsonUtils.parseFileToArray(path).getAllStrings());
+				} catch (IOException | JsonException e) {
+					tempFriends = new TreeSet<>();
+				}
+
+				if (!tempFriends.isEmpty()) {
+					// del temp frens
+					ArrayList<String> tmpFren = new ArrayList<>(tempFriends);
+					for (int i = 0; i < tempFriends.size(); i++) {
+						String name = tmpFren.get(i);
+						if (WURST.getFriends().contains(name))
+							WURST.getFriends().removeAndSave(name);
+					}
+
+					// clear temp frens
+					try {
+						JsonUtils.toJson(new JsonArray(), path);
+					} catch (IOException | JsonException e) {
+						//
+					}
+				}
+
+				ChatUtils.message("All temp frens removed. Oof.");
+			}
+			else
+			{
+				throw new CmdSyntaxError();
+			}
+		}
+		else
+		{
+			WURST.getFriends().removeAllAndSave();
+			ChatUtils.message("All frens removed. Oof.");
+		}
 	}
 	
 	private void list(String[] args) throws CmdException
@@ -113,12 +158,12 @@ public class FriendsCmd extends Command
 		if(page > pages || page < 1)
 			throw new CmdSyntaxError("Invalid page: " + page);
 		
-		ChatUtils.message("Current friends: " + friends.size());
+		ChatUtils.message("Current frens: " + friends.size());
 		
 		int start = (page - 1) * FRIENDS_PER_PAGE;
 		int end = Math.min(page * FRIENDS_PER_PAGE, friends.size());
 		
-		ChatUtils.message("Friends list (page " + page + "/" + pages + ")");
+		ChatUtils.message("Frens list (page " + page + "/" + pages + ")");
 		for(int i = start; i < end; i++)
 			ChatUtils.message(friends.get(i).toString());
 	}
