@@ -128,7 +128,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			if (bestSwordSlot == -1
 					|| bestSwordSlot == 0
 					|| currentSwordValue >= bestSwordValue
-					|| (!currentStack.isEmpty() && inventory.getEmptySlot() == -1)) {
+					|| inventory.getEmptySlot() == -1) {
 				break;
 			}
 

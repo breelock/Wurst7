@@ -72,6 +72,9 @@ public final class AutoToolDropHack extends Hack implements UpdateListener, Pack
 
 	@Override
 	public void onUpdate() {
+		bestToolsValue.clear();
+		bestToolsSlots.clear();
+
 		if (timer > 0) {
 			timer--;
 			return;

@@ -60,8 +60,17 @@ public abstract class GenericContainerScreenMixin
 					b -> autoSteal.store(this, rows))
 				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
 		}
-		
+
 		if(autoSteal.isEnabled())
-			autoSteal.steal(this, rows);
+		{
+			if (autoSteal.checkTitle.isChecked()) {
+				String titleStr = this.title.getString().toLowerCase();
+				if(titleStr.contains("chest") || titleStr.contains("сундук"))
+					autoSteal.steal(this, rows);
+			}
+			else
+				autoSteal.steal(this, rows);
+		}
+
 	}
 }

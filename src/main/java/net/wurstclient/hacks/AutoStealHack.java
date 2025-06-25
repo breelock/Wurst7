@@ -48,6 +48,9 @@ public final class AutoStealHack extends Hack
 
 	private final CheckboxSetting autoClose =
 			new CheckboxSetting("Auto close chest after steal", true);
+
+	public final CheckboxSetting checkTitle =
+			new CheckboxSetting("Check chest title, if it is not default, don't steal", true);
 	
 	private Thread thread;
 	private List<ItemStack> shit = new ArrayList<>();
@@ -61,6 +64,7 @@ public final class AutoStealHack extends Hack
 		addSetting(reverseSteal);
 		addSetting(dontStealShit);
 		addSetting(autoClose);
+		addSetting(checkTitle);
 	}
 	
 	public void steal(HandledScreen<?> screen, int rows)
@@ -90,8 +94,7 @@ public final class AutoStealHack extends Hack
 		boolean steal)
 	{
 		shit.clear();
-		List<Slot> slots = IntStream.range(from, to)
-			.mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
+		List<Slot> slots = IntStream.range(from, to).mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
 		
 		if(reverseSteal.isChecked() && steal)
 			Collections.reverse(slots);
@@ -142,77 +145,66 @@ public final class AutoStealHack extends Hack
 				bestArmorValues[armorType] = armorValue;
 		}
 
-		for (Slot slot : slots)
-			try
-			{
-				if (slot.getStack().isEmpty())
-					continue;
-
-				ItemStack stack = slot.getStack();
-				Item item = stack.getItem();
-				String itemName = Registries.ITEM.getId(item).toString();
-
-				if (dontStealShit.isChecked())
-				{
-					if (dropH.items.getItemNames().contains(itemName))
-					{
-						shit.add(stack);
+		while (true) {
+			for (Slot slot : slots)
+				try {
+					if (slot.getStack().isEmpty())
 						continue;
-					}
 
-					if (stack.getItem() instanceof SwordItem sword)
-					{
-						if (swordH.getSwordValue(stack, sword) <= bestSwordValue)
-						{
+					ItemStack stack = slot.getStack();
+					Item item = stack.getItem();
+					String itemName = Registries.ITEM.getId(item).toString();
+
+					if (dontStealShit.isChecked()) {
+						if (dropH.items.getItemNames().contains(itemName)) {
 							shit.add(stack);
 							continue;
 						}
-					}
 
-					if (stack.getItem() instanceof ArmorItem armorItem)
-					{
-						int armorType = armorItem.getSlotType().getEntitySlotId();
-						int armorValue = armorH.getArmorValue(armorItem, stack);
+						if (stack.getItem() instanceof SwordItem sword) {
+							if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
+								shit.add(stack);
+								continue;
+							}
+						}
 
-						if (armorValue <= bestArmorValues[armorType])
-						{
-							shit.add(stack);
-							continue;
+						if (stack.getItem() instanceof ArmorItem armorItem) {
+							int armorType = armorItem.getSlotType().getEntitySlotId();
+							int armorValue = armorH.getArmorValue(armorItem, stack);
+
+							if (armorValue <= bestArmorValues[armorType]) {
+								shit.add(stack);
+								continue;
+							}
 						}
 					}
 
+					Thread.sleep(delay.getValueI());
+
+					if (MC.currentScreen == null)
+						return;
+
+					screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
+
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+					return;
 				}
-				
-				Thread.sleep(delay.getValueI());
-				
-				if(MC.currentScreen == null)
+
+			boolean allEmpty = true;
+
+			for (Slot slot : slots) {
+				if (!slot.getStack().isEmpty() && !shit.contains(slot.getStack())) {
+					allEmpty = false;
 					break;
-				
-				screen.onMouseClick(slot, slot.id, 0,
-					SlotActionType.QUICK_MOVE);
-				
-			}catch(InterruptedException e)
-			{
-				Thread.currentThread().interrupt();
-				break;
+				}
 			}
 
-
-		boolean allEmpty = true;
-
-		for (Slot slot : slots) {
-			if (!slot.getStack().isEmpty() && !shit.contains(slot.getStack())) {
-				allEmpty = false;
+			if (allEmpty) {
+				if (autoClose.isChecked() && MC.currentScreen != null)
+					MC.execute(() -> MC.player.closeHandledScreen());
 				break;
 			}
-		}
-
-		if (allEmpty) {
-			if (autoClose.isChecked() && MC.currentScreen != null)
-				MC.execute(() -> MC.player.closeHandledScreen());
-		}
-		else {
-			shiftClickSlots(screen, from, to, steal);
 		}
 	}
 	
