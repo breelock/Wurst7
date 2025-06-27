@@ -21,6 +21,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -61,6 +63,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 
 	private int oldSlot;
 	private int timer;
+
+	private boolean invIsOpen = false;
 	
 	public AutoSwordHack()
 	{
@@ -139,7 +143,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			int slotId = bestSwordSlot < 9 ? bestSwordSlot + 36 : bestSwordSlot;
 			Int2ObjectMap<ItemStack> stackMap = new Int2ObjectOpenHashMap<>();
 			int revision = player.currentScreenHandler.getRevision();
-
+			openServInv(true);
 			player.networkHandler.sendPacket(new ClickSlotC2SPacket(
 					0, revision, slotId, 0, SlotActionType.PICKUP,
 					player.currentScreenHandler.getSlot(slotId).getStack(), stackMap));
@@ -147,6 +151,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			player.networkHandler.sendPacket(new ClickSlotC2SPacket(
 					0, revision, 36, 0, SlotActionType.PICKUP,
 					player.currentScreenHandler.getSlot(36).getStack(), stackMap));
+			openServInv(false);
 		} while (false);
 
 		// Throw away the worst swords
@@ -158,7 +163,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 				ItemStack stack = inventory.getStack(adjusted);
 
 				if (!stack.isEmpty() && isWorseOrSameSword(stack)) {
+					openServInv(true);
 					IMC.getInteractionManager().windowClick_THROW(slot);
+					openServInv(false);
 				}
 			}
 		}
@@ -300,6 +307,22 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		public String toString()
 		{
 			return name;
+		}
+	}
+
+	private void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
 		}
 	}
 }

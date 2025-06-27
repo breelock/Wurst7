@@ -53,6 +53,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	private Screen tempCurrentScreen;
 	private boolean hideNextItemUse;
+	private boolean clip = false;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
 		GameProfile profile)
@@ -268,8 +269,7 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	@Override
 	protected boolean clipAtLedge()
 	{
-		return super.clipAtLedge()
-			|| WurstClient.INSTANCE.getHax().safeWalkHack.isEnabled();
+		return super.clipAtLedge() || WurstClient.INSTANCE.getHax().safeWalkHack.clip();
 	}
 	
 	/**

@@ -201,11 +201,12 @@ public final class AutoStealHack extends Hack
 			}
 
 			if (allEmpty) {
-				if (autoClose.isChecked() && MC.currentScreen != null)
+				if (autoClose.isChecked() && MC.currentScreen == screen)
 					MC.execute(() -> MC.player.closeHandledScreen());
 				break;
 			}
 		}
+		thread.interrupt();
 	}
 	
 	public boolean areButtonsVisible()

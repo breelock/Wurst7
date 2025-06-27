@@ -34,7 +34,6 @@ import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
 import net.wurstclient.events.KeyPressListener;
 import net.wurstclient.events.PostMotionListener;
 import net.wurstclient.events.PreMotionListener;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
@@ -46,7 +45,6 @@ import net.wurstclient.other_feature.OtfList;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
-import net.wurstclient.update.WurstUpdater;
 import net.wurstclient.util.json.JsonException;
 
 public enum WurstClient
@@ -78,7 +76,6 @@ public enum WurstClient
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
-	private WurstUpdater updater;
 	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
 	
@@ -137,9 +134,6 @@ public enum WurstClient
 		rotationFaker = new RotationFaker();
 		eventManager.add(PreMotionListener.class, rotationFaker);
 		eventManager.add(PostMotionListener.class, rotationFaker);
-		
-		updater = new WurstUpdater();
-		eventManager.add(UpdateListener.class, updater);
 		
 		problematicPackDetector = new ProblematicResourcePackDetector();
 		problematicPackDetector.start();
@@ -323,11 +317,6 @@ public enum WurstClient
 		}
 	}
 	
-	public WurstUpdater getUpdater()
-	{
-		return updater;
-	}
-	
 	public ProblematicResourcePackDetector getProblematicPackDetector()
 	{
 		return problematicPackDetector;
@@ -337,7 +326,7 @@ public enum WurstClient
 	{
 		return wurstFolder;
 	}
-	
+
 	public AltManager getAltManager()
 	{
 		return altManager;

@@ -7,7 +7,6 @@
  */
 package net.wurstclient.hacks;
 
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -28,18 +27,24 @@ public final class SafeWalkHack extends Hack
 		"Sneak edge distance",
 		"How close SafeWalk will let you get to the edge before sneaking.\n\n"
 			+ "This setting is only used when \"Sneak at edges\" is enabled.",
-		0.05, 0.05, 0.25, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
+		0.3, 0.05, 0.3, 0.001, ValueDisplay.DECIMAL.withSuffix("m"));
+
+	private final SliderSetting permittedHeight = new SliderSetting(
+			"Permitted height",
+			"Permitted height",
+			5, 0, 100, 1, ValueDisplay.DECIMAL);
 	
 	private boolean sneaking;
-	
+
 	public SafeWalkHack()
 	{
 		super("SafeWalk");
 		setCategory(Category.MOVEMENT);
 		addSetting(sneak);
 		addSetting(edgeDistance);
+		addSetting(permittedHeight);
 	}
-	
+
 	@Override
 	protected void onEnable()
 	{
@@ -53,29 +58,34 @@ public final class SafeWalkHack extends Hack
 		if(sneaking)
 			setSneaking(false);
 	}
-	
+
 	public void onClipAtLedge(boolean clipping)
 	{
-		ClientPlayerEntity player = MC.player;
-		
-		if(!isEnabled() || !sneak.isChecked() || !player.isOnGround())
+		if(!isEnabled() || !sneak.isChecked() || !MC.player.isOnGround())
 		{
 			if(sneaking)
 				setSneaking(false);
-			
 			return;
 		}
-		
-		Box box = player.getBoundingBox();
-		Box adjustedBox = box.stretch(0, -player.stepHeight, 0)
-			.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue());
-		
-		if(MC.world.isSpaceEmpty(player, adjustedBox))
+
+		if(clip())
 			clipping = true;
-		
+
 		setSneaking(clipping);
 	}
-	
+
+	public boolean clip()
+	{
+		if (!isEnabled())
+			return false;
+
+		Box adjustedBox = MC.player.getBoundingBox().stretch(0, -MC.player.stepHeight, 0)
+				.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue())
+				.stretch(0, -permittedHeight.getValue(), 0);
+
+		return MC.world.isSpaceEmpty(MC.player, adjustedBox);
+	}
+
 	private void setSneaking(boolean sneaking)
 	{
 		IKeyBinding sneakKey = IKeyBinding.get(MC.options.sneakKey);

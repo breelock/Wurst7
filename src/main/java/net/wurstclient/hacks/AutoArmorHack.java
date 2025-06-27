@@ -21,6 +21,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -52,6 +54,7 @@ public final class AutoArmorHack extends Hack
 	private final CheckboxSetting dropArmor = new CheckboxSetting("Drop armor", "Throw away the worst armor", true);
 	
 	private int timer;
+	private boolean invIsOpen = false;
 	
 	public AutoArmorHack()
 	{
@@ -157,10 +160,11 @@ public final class AutoArmorHack extends Hack
 				slot += 36;
 			
 			// swap armor
+			openServInv(true);
 			if(!oldArmor.isEmpty())
 				IMC.getInteractionManager().windowClick_QUICK_MOVE(8 - type);
 			IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
-			
+			openServInv(false);
 			break;
 		}
 
@@ -177,7 +181,11 @@ public final class AutoArmorHack extends Hack
 				if(!stack.isEmpty())
 				{
 					if(isWorseOrSameArmor(stack))
+					{
+						openServInv(true);
 						IMC.getInteractionManager().windowClick_THROW(slot);
+						openServInv(false);
+					}
 				}
 			}
 		}
@@ -225,6 +233,22 @@ public final class AutoArmorHack extends Hack
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
 		}
 		return baseProtection * 5 + enchantmentBonus;
+	}
+
+	private void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
+		}
 	}
 
 	@Override

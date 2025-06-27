@@ -11,6 +11,8 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.registry.Registries;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
@@ -39,6 +41,7 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		Math.random() < 0.01 ? "AutoLinus" : getName();
 
 	private boolean isDropped = false;
+	private boolean invIsOpen = false;
 	
 	public AutoDropHack()
 	{
@@ -113,12 +116,30 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			if(!items.getItemNames().contains(itemName))
 				continue;
 
+			openServInv(true);
 			IMC.getInteractionManager().windowClick_THROW(slot);
+			openServInv(false);
 		}
 
 		if (disableAfterDrop.isChecked()) {
 			isDropped = true;
 			this.setEnabled(false);
+		}
+	}
+
+	private void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
 		}
 	}
 }

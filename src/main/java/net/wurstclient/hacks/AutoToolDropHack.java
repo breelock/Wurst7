@@ -16,6 +16,8 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.*;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.PacketOutputListener;
@@ -46,6 +48,8 @@ public final class AutoToolDropHack extends Hack implements UpdateListener, Pack
 
 	private final Map<MCTool, Float> bestToolsValue = new HashMap<>();
 	private final Map<MCTool, Integer> bestToolsSlots = new HashMap<>();
+
+	private boolean invIsOpen = false;
 
 	public AutoToolDropHack()
 	{
@@ -115,7 +119,9 @@ public final class AutoToolDropHack extends Hack implements UpdateListener, Pack
 				continue;
 
 			if (!stack.isEmpty() && isWorseOrSameTool(stack)) {
+				openServInv(true);
 				IMC.getInteractionManager().windowClick_THROW(slot);
+				openServInv(true);
 			}
 		}
 	}
@@ -197,5 +203,21 @@ public final class AutoToolDropHack extends Hack implements UpdateListener, Pack
 		}
 
 		return toolType;
+	}
+
+	private void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
+		}
 	}
 }
