@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
 import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EnumSetting;
 
@@ -27,9 +28,12 @@ public final class WurstLogoOtf extends OtherFeature
 	
 	private final ColorSetting txtColor =
 		new ColorSetting("Text", "Text color.", Color.BLACK);
-	
+
 	private final EnumSetting<Visibility> visibility =
-		new EnumSetting<>("Visibility", Visibility.values(), Visibility.NEVER);
+		new EnumSetting<>("Visibility", Visibility.values(), Visibility.ALWAYS);
+
+	private final CheckboxSetting showTxt =
+			new CheckboxSetting("Show text", "Show text", false);
 	
 	public WurstLogoOtf()
 	{
@@ -37,6 +41,7 @@ public final class WurstLogoOtf extends OtherFeature
 		addSetting(bgColor);
 		addSetting(txtColor);
 		addSetting(visibility);
+		addSetting(showTxt);
 	}
 	
 	public boolean isVisible()
@@ -52,6 +57,11 @@ public final class WurstLogoOtf extends OtherFeature
 	public int getTextColor()
 	{
 		return txtColor.getColorI();
+	}
+
+	public boolean isTextVisible()
+	{
+		return showTxt.isChecked();
 	}
 	
 	public static enum Visibility

@@ -94,6 +94,8 @@ public final class AutoStealHack extends Hack
 		boolean steal)
 	{
 		shit.clear();
+		boolean isShitChest = true;
+
 		List<Slot> slots = IntStream.range(from, to).mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
 		
 		if(reverseSteal.isChecked() && steal)
@@ -185,6 +187,7 @@ public final class AutoStealHack extends Hack
 						return;
 
 					screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
+					isShitChest = false;
 
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
@@ -201,7 +204,7 @@ public final class AutoStealHack extends Hack
 			}
 
 			if (allEmpty) {
-				if (autoClose.isChecked() && MC.currentScreen == screen)
+				if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)
 					MC.execute(() -> MC.player.closeHandledScreen());
 				break;
 			}

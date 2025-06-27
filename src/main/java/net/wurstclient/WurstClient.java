@@ -16,10 +16,13 @@ import java.util.stream.Stream;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
 import net.wurstclient.analytics.PlausibleAnalytics;
@@ -46,6 +49,7 @@ import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.util.json.JsonException;
+import org.lwjgl.glfw.GLFW;
 
 public enum WurstClient
 {
@@ -78,6 +82,8 @@ public enum WurstClient
 	private static boolean guiInitialized;
 	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
+
+	private boolean wasPressedLastTick = false;
 	
 	public void initialize()
 	{
@@ -147,8 +153,24 @@ public enum WurstClient
 			System.out.println("[Wurst] Applying fixes for Sinytra Connector");
 			HudRenderCallback.EVENT.register(this::onHudRender);
 		}
+
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (client.currentScreen == null && isDotPressed()) {
+				if (!wasPressedLastTick) {
+					client.setScreen(new net.minecraft.client.gui.screen.ChatScreen("."));
+				}
+				wasPressedLastTick = true;
+			} else {
+				wasPressedLastTick = false;
+			}
+		});
 	}
-	
+
+	private boolean isDotPressed() {
+		long windowHandle = MinecraftClient.getInstance().getWindow().getHandle();
+		return GLFW.glfwGetKey(windowHandle, GLFW.GLFW_KEY_PERIOD) == GLFW.GLFW_PRESS;
+	}
+
 	// Alternative HUD rendering when using Sinytra Connector
 	private void onHudRender(DrawContext context, float tickDelta)
 	{

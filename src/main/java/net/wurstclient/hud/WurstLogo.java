@@ -27,31 +27,31 @@ public final class WurstLogo
 		WurstLogoOtf otf = WURST.getOtfs().wurstLogoOtf;
 		if(!otf.isVisible())
 			return;
-		
-		String version = getVersionString();
-		TextRenderer tr = WurstClient.MC.textRenderer;
-		
-		// background
-		int bgColor;
-		if(WURST.getHax().rainbowUiHack.isEnabled())
-			bgColor = RenderUtils.toIntColor(WURST.getGui().getAcColor(), 0.5F);
-		else
-			bgColor = otf.getBackgroundColor();
-		context.fill(0, 6, tr.getWidth(version) + 76, 17, bgColor);
-		
-		// version string
-		context.drawText(tr, version, 74, 8, otf.getTextColor(), false);
-		
+
+		if (otf.isTextVisible())
+		{
+			String version = getVersionString();
+			TextRenderer tr = WurstClient.MC.textRenderer;
+
+			// background
+			int bgColor;
+			if(WURST.getHax().rainbowUiHack.isEnabled())
+				bgColor = RenderUtils.toIntColor(WURST.getGui().getAcColor(), 0.5F);
+			else
+				bgColor = otf.getBackgroundColor();
+			context.fill(0, 6, tr.getWidth(version) + 76 + 3, 17, bgColor);
+
+			// version string
+			context.drawText(tr, version, 74 + 3, 8, otf.getTextColor(), false);
+		}
+
 		// Wurst logo
 		RenderSystem.enableBlend();
-		context.drawTexture(LOGO_TEXTURE, 0, 3, 0, 0, 72, 18, 72, 18);
+		context.drawTexture(LOGO_TEXTURE, 3, 3, 0, 0, 72, 18, 72, 18);
 	}
 	
 	private String getVersionString()
 	{
-		String version = "v" + WurstClient.VERSION;
-		version += " MC" + WurstClient.MC_VERSION;
-		
-		return version;
+		return "by breelock";
 	}
 }

@@ -34,7 +34,6 @@
     "EntityMixin",
     "EntityRendererMixin",
     "FluidRendererMixin",
-    "GameMenuScreenMixin",
     "GameRendererMixin",
     "GenericContainerScreenMixin",
     "HeldItemRendererMixin",

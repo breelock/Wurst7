@@ -152,8 +152,8 @@ public final class AutoArmorHack extends Hack
 			// check if armor can be swapped
 			// needs 1 free slot where it can put the old armor
 			ItemStack oldArmor = inventory.getArmorStack(type);
-			if(inventory.getEmptySlot() == -1)
-				break;
+			if(!oldArmor.isEmpty() && inventory.getEmptySlot() == -1)
+				continue;
 			
 			// hotbar fix
 			if(slot < 9)
