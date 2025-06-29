@@ -12,10 +12,9 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.WurstClient;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.SliderSetting;
-import net.wurstclient.util.ChatUtils;
+import net.wurstclient.settings.TextFieldSetting;
 import net.wurstclient.util.json.JsonException;
 import net.wurstclient.util.json.JsonUtils;
 
@@ -23,14 +22,20 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeSet;
 
 @SearchTags({"auto leave", "AutoDisconnect", "auto disconnect", "AutoQuit",
 	"auto quit"})
-public final class AutoFriendsHack extends Hack implements UpdateListener
+public final class AutoFriendsHack extends Hack
 {
 	private TreeSet<String> tempFriends = new TreeSet<>();
 	private final Path path = MC.runDirectory.toPath().normalize().resolve("wurst").resolve("tempFriends.json");
+
+	public final TextFieldSetting titleText = new TextFieldSetting("Title text to trigger", "in lower case!", "1");
+
+	private final SliderSetting maxTempFrens = new SliderSetting("Max temp frens",
+			"Max temp frens", 3, 1, 10, 1, SliderSetting.ValueDisplay.DECIMAL);
 
 	private final SliderSetting perimeter = new SliderSetting("Detect perimeter",
 			"Detect perimeter",
@@ -41,24 +46,8 @@ public final class AutoFriendsHack extends Hack implements UpdateListener
 		super("AutoFriends");
 		setCategory(Category.COMBAT);
 		addSetting(perimeter);
-	}
-
-	@Override
-	protected void onEnable()
-	{
-		EVENTS.add(UpdateListener.class, this);
-	}
-
-	@Override
-	protected void onDisable()
-	{
-		EVENTS.remove(UpdateListener.class, this);
-	}
-
-	@Override
-	public void onUpdate()
-	{
-
+		addSetting(maxTempFrens);
+		addSetting(titleText);
 	}
 
 	public void trigger()
@@ -91,29 +80,27 @@ public final class AutoFriendsHack extends Hack implements UpdateListener
         }
 
 		if (WurstClient.MC.player != null && WurstClient.MC.world != null) {
-			AbstractClientPlayerEntity nearest = WurstClient.MC.world.getPlayers().stream()
-					.filter(p -> !p.getName().getString().equals(WurstClient.MC.player.getName().getString()))
+			List<AbstractClientPlayerEntity> nearestPlayers = WurstClient.MC.world.getPlayers().stream()
+					.filter(p -> !p.equals(WurstClient.MC.player))
 					.filter(p -> p.squaredDistanceTo(WurstClient.MC.player) <= perimeter.getValue())
-					.min(Comparator.comparingDouble(p -> p.squaredDistanceTo(WurstClient.MC.player)))
-					.orElse(null);
+					.sorted(Comparator.comparingDouble(p -> p.squaredDistanceTo(WurstClient.MC.player)))
+					.limit(maxTempFrens.getValueI()).toList();
 
-			if (nearest != null) {
-				String name = nearest.getEntityName();
+			for (AbstractClientPlayerEntity player : nearestPlayers) {
+				String name = player.getEntityName();
 				if (!WURST.getFriends().contains(name)) {
 					WURST.getFriends().addAndSave(name);
 
-					// add temp fren
 					if (tempFriends != null)
 						tempFriends.add(name);
 
-					// save to json
-                    try {
-                        JsonUtils.toJson(createJson(), path);
-                    } catch (IOException | JsonException e) {
-                        //
-                    }
+					try {
+						JsonUtils.toJson(createJson(), path);
+					} catch (IOException | JsonException e) {
+						//
+					}
 
-                    // ChatUtils.message("Detected temp fren \"" + name + "\".");
+					// ChatUtils.message("Detected temp fren \"" + name + "\".");
 				}
 			}
 		}

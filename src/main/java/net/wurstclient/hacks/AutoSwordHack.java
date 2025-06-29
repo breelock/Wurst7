@@ -171,7 +171,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		}
 	}
 
-
 	public boolean isWorseOrSameSword(ItemStack candidate)
 	{
 		// If candidate is not sword

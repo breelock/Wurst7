@@ -39,7 +39,10 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	CameraTransformViewBobbingListener, RenderListener
 {
 	private final EspStyleSetting style = new EspStyleSetting();
-	
+
+	private final CheckboxSetting drawSolidBoxes = new CheckboxSetting(
+			"Draw solid boxes", "Draw solid boxes", false);
+
 	private final ChestEspBlockGroup basicChests = new ChestEspBlockGroup(
 		new ColorSetting("Chest color",
 			"Normal chests will be highlighted in this color.", Color.GREEN),
@@ -119,7 +122,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 	{
 		super("ChestESP");
 		setCategory(Category.RENDER);
-		
+
+		addSetting(drawSolidBoxes);
 		addSetting(style);
 		groups.stream().flatMap(ChestEspGroup::getSettings)
 			.forEach(this::addSetting);
@@ -212,10 +216,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 			List<Box> boxes = group.getBoxes();
 			int quadsColor = group.getColorI(0x40);
 			int linesColor = group.getColorI(0x80);
-			
-			RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
-			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor,
-				false);
+
+			if (drawSolidBoxes.isChecked())
+				RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);
+
+			RenderUtils.drawOutlinedBoxes(matrixStack, boxes, linesColor, false);
 		}
 	}
 	

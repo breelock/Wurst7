@@ -147,69 +147,68 @@ public final class AutoStealHack extends Hack
 				bestArmorValues[armorType] = armorValue;
 		}
 
-		while (true) {
-			for (Slot slot : slots)
-				try {
-					if (slot.getStack().isEmpty())
-						continue;
+        while (MC.currentScreen == screen) {
+            for (Slot slot : slots)
+                try {
+                    if (slot.getStack().isEmpty())
+                        continue;
 
-					ItemStack stack = slot.getStack();
-					Item item = stack.getItem();
-					String itemName = Registries.ITEM.getId(item).toString();
+                    ItemStack stack = slot.getStack();
+                    Item item = stack.getItem();
+                    String itemName = Registries.ITEM.getId(item).toString();
 
-					if (dontStealShit.isChecked()) {
-						if (dropH.items.getItemNames().contains(itemName)) {
-							shit.add(stack);
-							continue;
-						}
+                    if (dontStealShit.isChecked()) {
+                        if (dropH.items.getItemNames().contains(itemName)) {
+                            shit.add(stack);
+                            continue;
+                        }
 
-						if (stack.getItem() instanceof SwordItem sword) {
-							if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
-								shit.add(stack);
-								continue;
-							}
-						}
+                        if (stack.getItem() instanceof SwordItem sword) {
+                            if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
+                                shit.add(stack);
+                                continue;
+                            }
+                        }
 
-						if (stack.getItem() instanceof ArmorItem armorItem) {
-							int armorType = armorItem.getSlotType().getEntitySlotId();
-							int armorValue = armorH.getArmorValue(armorItem, stack);
+                        if (stack.getItem() instanceof ArmorItem armorItem) {
+                            int armorType = armorItem.getSlotType().getEntitySlotId();
+                            int armorValue = armorH.getArmorValue(armorItem, stack);
 
-							if (armorValue <= bestArmorValues[armorType]) {
-								shit.add(stack);
-								continue;
-							}
-						}
-					}
+                            if (armorValue <= bestArmorValues[armorType]) {
+                                shit.add(stack);
+                                continue;
+                            }
+                        }
+                    }
 
-					Thread.sleep(delay.getValueI());
+                    Thread.sleep(delay.getValueI());
 
-					if (MC.currentScreen == null)
+					if (MC.currentScreen != screen)
 						return;
 
-					screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
-					isShitChest = false;
+                    screen.onMouseClick(slot, slot.id, 0, SlotActionType.QUICK_MOVE);
+                    isShitChest = false;
 
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					return;
-				}
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
 
-			boolean allEmpty = true;
+            boolean allEmpty = true;
 
-			for (Slot slot : slots) {
-				if (!slot.getStack().isEmpty() && !shit.contains(slot.getStack())) {
-					allEmpty = false;
-					break;
-				}
-			}
+            for (Slot slot : slots) {
+                if (!slot.getStack().isEmpty() && !shit.contains(slot.getStack())) {
+                    allEmpty = false;
+                    break;
+                }
+            }
 
-			if (allEmpty) {
-				if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)
-					MC.execute(() -> MC.player.closeHandledScreen());
-				break;
-			}
-		}
-		thread.interrupt();
+            if (allEmpty) {
+                if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)
+                    MC.execute(() -> MC.player.closeHandledScreen());
+                break;
+            }
+        }
 	}
 	
 	public boolean areButtonsVisible()

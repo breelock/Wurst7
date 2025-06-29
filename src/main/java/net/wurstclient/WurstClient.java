@@ -21,8 +21,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
 import net.wurstclient.analytics.PlausibleAnalytics;
@@ -45,21 +43,25 @@ import net.wurstclient.keybinds.KeybindProcessor;
 import net.wurstclient.mixinterface.IMinecraftClient;
 import net.wurstclient.navigator.Navigator;
 import net.wurstclient.other_feature.OtfList;
-import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
+import net.wurstclient.util.DiscordRPC;
 import net.wurstclient.util.json.JsonException;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum WurstClient
 {
 	INSTANCE;
-	
-	public static MinecraftClient MC;
+
+    public static final Logger log = LoggerFactory.getLogger(WurstClient.class);
+    public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 	
 	public static final String VERSION = "7.48.1";
 	public static final String MC_VERSION = "1.20.1";
+	private static final String DsRpcClientID = "1388520259534983238";
 	
 	private PlausibleAnalytics plausible;
 	private EventManager eventManager;
@@ -164,6 +166,15 @@ public enum WurstClient
 				wasPressedLastTick = false;
 			}
 		});
+
+		if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled())
+		{
+            try {
+                new DiscordRPC(DsRpcClientID).run();
+            } catch (Exception e) {
+				log.error(e.toString());
+            }
+        }
 	}
 
 	private boolean isDotPressed() {
@@ -272,9 +283,8 @@ public enum WurstClient
 		Command cmd = getCmds().getCmdByName(name.substring(1));
 		if(cmd != null)
 			return cmd;
-		
-		OtherFeature otf = getOtfs().getOtfByName(name);
-		return otf;
+
+        return getOtfs().getOtfByName(name);
 	}
 	
 	public KeybindList getKeybinds()

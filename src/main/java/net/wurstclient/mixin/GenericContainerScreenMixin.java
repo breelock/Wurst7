@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.util.ChatUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -65,7 +66,7 @@ public abstract class GenericContainerScreenMixin
 		{
 			if (autoSteal.checkTitle.isChecked()) {
 				String titleStr = this.title.getString().toLowerCase();
-				if(titleStr.contains("chest") || titleStr.contains("сундук"))
+				if (titleStr.contains("chest") || titleStr.contains("сундук"))
 					autoSteal.steal(this, rows);
 			}
 			else
