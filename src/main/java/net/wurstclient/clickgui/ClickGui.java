@@ -38,10 +38,15 @@ import net.wurstclient.settings.Setting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.json.JsonUtils;
 
+import static net.wurstclient.WurstClient.floatRgbToArgb;
+
 public final class ClickGui
 {
 	private static final WurstClient WURST = WurstClient.INSTANCE;
 	private static final MinecraftClient MC = WurstClient.MC;
+
+	public static float[] guiColor;
+	public static int intGuiColor;
 	
 	private final ArrayList<Window> windows = new ArrayList<>();
 	private final ArrayList<Popup> popups = new ArrayList<>();
@@ -67,7 +72,7 @@ public final class ClickGui
 	public void init()
 	{
 		updateColors();
-		
+
 		LinkedHashMap<Category, Window> windowMap = new LinkedHashMap<>();
 		for(Category category : Category.values())
 			windowMap.put(category, new Window(category.getName()));
@@ -584,6 +589,9 @@ public final class ClickGui
 		
 		opacity = clickGui.getOpacity();
 		ttOpacity = clickGui.getTooltipOpacity();
+		float[] mcl = clickGui.getMainColor();
+		guiColor = new float[] {mcl[0], mcl[1], mcl[2], getOpacity()};
+		intGuiColor = floatRgbToArgb(guiColor, getOpacity());
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
 		maxHeight = clickGui.getMaxHeight();

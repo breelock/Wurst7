@@ -24,6 +24,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspBoxSizeSetting;
 import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.EntityUtils;
 import net.wurstclient.util.RenderUtils;
 
@@ -39,6 +40,11 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	
 	private final ColorSetting color = new ColorSetting("Color",
 		"Items will be highlighted in this color.", Color.YELLOW);
+
+	private final SliderSetting alpha = new SliderSetting("Alpha",
+			"Esp alpha color.",
+			0.5, 0, 1, 0.01,
+			SliderSetting.ValueDisplay.DECIMAL);
 	
 	private final ArrayList<ItemEntity> items = new ArrayList<>();
 	
@@ -49,6 +55,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 		addSetting(style);
 		addSetting(boxSize);
 		addSetting(color);
+		addSetting(alpha);
 	}
 	
 	@Override
@@ -87,7 +94,7 @@ public final class ItemEspHack extends Hack implements UpdateListener,
 	@Override
 	public void onRender(MatrixStack matrixStack, float partialTicks)
 	{
-		int lineColor = color.getColorI(0x80);
+		int lineColor = color.getColorI(alpha.getValueF());
 		
 		if(style.hasBoxes())
 		{

@@ -74,10 +74,10 @@ public final class NavigatorMainScreen extends NavigatorScreen
 	protected void onKeyPress(int keyCode, int scanCode, int int_3)
 	{
 		if(keyCode == GLFW.GLFW_KEY_ENTER)
-			leftClick(selectedFeature);
-		
-		if(keyCode == GLFW.GLFW_KEY_SPACE)
 			expand(selectedFeature);
+		
+		// if(keyCode == GLFW.GLFW_KEY_SPACE)
+		//	expand(selectedFeature);
 		
 		if(keyCode == GLFW.GLFW_KEY_RIGHT
 			|| keyCode == GLFW.GLFW_KEY_TAB && !hasShiftDown())
@@ -350,8 +350,9 @@ public final class NavigatorMainScreen extends NavigatorScreen
 		
 		// box & shadow
 		int featColor = RenderUtils.toIntColor(
-			feature.isEnabled() ? new float[]{0, 1, 0} : gui.getBgColor(),
-			gui.getOpacity() * (renderAsHovered ? 1.5F : 1));
+				feature.isEnabled() ? WurstClient.INSTANCE.getGui().guiColor : gui.getBgColor(),
+				gui.getOpacity() * (renderAsHovered ? 1.5F : 1));
+
 		drawBox(context, area.x, area.y, area.x + area.width,
 			area.y + area.height, featColor);
 		

@@ -453,7 +453,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 				mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
 			int buttonColor;
 			if(feature.isEnabled() && button == primaryButton)
-				buttonColor = hovering ? 0x4000FF00 : 0x4000E000;
+				buttonColor = WurstClient.INSTANCE.getGui().intGuiColor;
 			else
 				buttonColor = hovering ? 0x40606060 : 0x40404040;
 			

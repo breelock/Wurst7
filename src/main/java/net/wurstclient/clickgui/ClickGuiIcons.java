@@ -31,14 +31,14 @@ public enum ClickGuiIcons
 		{
 			ya1 = y1 + 3;
 			ya2 = y2 - 2.5F;
-			arrowColor = hovering ? 0xFF00FF00 : 0xFF00D900;
+			arrowColor = WurstClient.INSTANCE.getGui().intGuiColor;
 			arrowVertices = new float[][]{{xa1, ya1}, {xa2, ya2}, {xa3, ya1}};
 			
 		}else
 		{
 			ya1 = y2 - 3;
 			ya2 = y1 + 2.5F;
-			arrowColor = hovering ? 0xFFFF0000 : 0xFFD90000;
+			arrowColor = WurstClient.INSTANCE.getGui().intGuiColor;
 			arrowVertices = new float[][]{{xa1, ya1}, {xa3, ya1}, {xa2, ya2}};
 		}
 		RenderUtils.fillTriangle2D(context, arrowVertices, arrowColor);
@@ -83,7 +83,7 @@ public enum ClickGuiIcons
 			float yk3 = y2 - 0.5F;
 			
 			// knob
-			int knobColor = hovering ? 0xFFFF0000 : 0xFFD90000;
+			int knobColor = WurstClient.INSTANCE.getGui().intGuiColor;
 			RenderUtils.fill2D(context, xk1, yk1, xk2, yk2, knobColor);
 			RenderUtils.fill2D(context, xk3, yk2, xk4, yk3, knobColor);
 			
@@ -118,7 +118,7 @@ public enum ClickGuiIcons
 			float yk7 = y2 - 1;
 			
 			// knob
-			int knobColor = hovering ? 0xFF00FF00 : 0xFF00D900;
+			int knobColor = WurstClient.INSTANCE.getGui().intGuiColor;
 			float[][] knobVertices = {{xk4, yk4}, {xk3, yk3}, {xk2, yk2},
 				{xk1, yk1}, {xk5, yk5}, {xk7, yk4}, {xk3, yk7}, {xk6, yk6}};
 			RenderUtils.fillQuads2D(context, knobVertices, knobColor);
@@ -161,8 +161,7 @@ public enum ClickGuiIcons
 		float yc6 = y2 - 2.5F;
 		
 		// check
-		int checkColor =
-			grayedOut ? 0xC0808080 : hovering ? 0xFF00FF00 : 0xFF00D900;
+		int checkColor = WurstClient.INSTANCE.getGui().intGuiColor;
 		float[][] checkVertices = {{xc2, yc3}, {xc1, yc4}, {xc3, yc6},
 			{xc3, yc5}, {xc3, yc5}, {xc3, yc6}, {xc5, yc2}, {xc4, yc1}};
 		RenderUtils.fillQuads2D(context, checkVertices, checkColor);
@@ -193,7 +192,7 @@ public enum ClickGuiIcons
 		float yc7 = y2 - 3.5F;
 		
 		// cross
-		int crossColor = hovering ? 0xFFFF0000 : 0xFFD90000;
+		int crossColor = WurstClient.INSTANCE.getGui().intGuiColor;
 		float[][] crossVertices = {{xc2, yc2}, {xc1, yc1}, {xc4, yc4},
 			{xc3, yc3}, {xc3, yc1}, {xc4, yc2}, {xc6, yc5}, {xc7, yc6},
 			{xc6, yc7}, {xc5, yc6}, {xc1, yc3}, {xc2, yc4}};

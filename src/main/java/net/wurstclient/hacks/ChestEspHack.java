@@ -32,6 +32,7 @@ import net.wurstclient.hacks.chestesp.ChestEspGroup;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.util.RenderUtils;
 import net.wurstclient.util.chunk.ChunkUtils;
 
@@ -110,6 +111,11 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		new ChestEspBlockGroup(new ColorSetting("Furnace color",
 			"Furnaces, smokers, and blast furnaces will be highlighted in this color.",
 			Color.RED), new CheckboxSetting("Include furnaces", false));
+
+	private final SliderSetting alpha = new SliderSetting("Alpha",
+			"Esp alpha color.",
+			0.5, 0, 1, 0.01,
+			SliderSetting.ValueDisplay.DECIMAL);
 	
 	private final List<ChestEspGroup> groups = Arrays.asList(basicChests,
 		trapChests, enderChests, chestCarts, chestBoats, barrels, shulkerBoxes,
@@ -123,6 +129,7 @@ public class ChestEspHack extends Hack implements UpdateListener,
 		super("ChestESP");
 		setCategory(Category.RENDER);
 
+		addSetting(alpha);
 		addSetting(drawSolidBoxes);
 		addSetting(style);
 		groups.stream().flatMap(ChestEspGroup::getSettings)
@@ -214,8 +221,8 @@ public class ChestEspHack extends Hack implements UpdateListener,
 				continue;
 			
 			List<Box> boxes = group.getBoxes();
-			int quadsColor = group.getColorI(0x40);
-			int linesColor = group.getColorI(0x80);
+			int quadsColor = group.getColorI(alpha.getValueF());
+			int linesColor = group.getColorI(alpha.getValueF());
 
 			if (drawSolidBoxes.isChecked())
 				RenderUtils.drawSolidBoxes(matrixStack, boxes, quadsColor, false);

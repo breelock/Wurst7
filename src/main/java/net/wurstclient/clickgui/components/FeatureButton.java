@@ -12,6 +12,7 @@ import java.util.Objects;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.Feature;
+import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.ClickGui;
 import net.wurstclient.clickgui.ClickGuiIcons;
 import net.wurstclient.clickgui.Component;
@@ -124,7 +125,7 @@ public final class FeatureButton extends Component
 	
 	private int getButtonColor(boolean enabled, boolean hovering)
 	{
-		float[] rgb = enabled ? new float[]{0, 1, 0} : GUI.getBgColor();
+		float[] rgb = enabled ? WurstClient.INSTANCE.getGui().guiColor : GUI.getBgColor();
 		float opacity = GUI.getOpacity() * (hovering ? 1.5F : 1);
 		return RenderUtils.toIntColor(rgb, opacity);
 	}

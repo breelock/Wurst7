@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,11 +24,8 @@ import net.wurstclient.events.CameraTransformViewBobbingListener;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.EspBoxSizeSetting;
-import net.wurstclient.settings.EspStyleSetting;
+import net.wurstclient.settings.*;
 import net.wurstclient.settings.EspStyleSetting.EspStyle;
-import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.filterlists.EntityFilterList;
 import net.wurstclient.settings.filters.FilterInvisibleSetting;
 import net.wurstclient.settings.filters.FilterSleepingSetting;
@@ -44,8 +42,16 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 	private final EspStyleSetting style =
 		new EspStyleSetting(EspStyle.LINES_AND_BOXES);
 
-	private final CheckboxSetting alwaysGreen = new CheckboxSetting("Always green color",
-			"Always green color", true);
+	private final CheckboxSetting alwaysOne = new CheckboxSetting("Always one color",
+			"Always one color", true);
+
+	private final ColorSetting color = new ColorSetting("Color",
+			"Esp color.", Color.RED);
+
+	private final SliderSetting alpha = new SliderSetting("Alpha",
+			"Esp alpha color.",
+			0.5, 0, 1, 0.01,
+			SliderSetting.ValueDisplay.DECIMAL);
 	
 	private final EspBoxSizeSetting boxSize = new EspBoxSizeSetting(
 		"\u00a7lAccurate\u00a7r mode shows the exact hitbox of each player.\n"
@@ -62,8 +68,10 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 		super("PlayerESP");
 		setCategory(Category.RENDER);
 		addSetting(style);
+		addSetting(color);
+		addSetting(alpha);
 		addSetting(boxSize);
-		addSetting(alwaysGreen);
+		addSetting(alwaysOne);
 		entityFilters.forEach(this::addSetting);
 	}
 	
@@ -145,8 +153,8 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			return 0x800000FF;
 
 		float[] rgb;
-		if (alwaysGreen.isChecked()) {
-			rgb = new float[] {0, 255, 0};
+		if (alwaysOne.isChecked()) {
+			rgb = color.getColorF();
 		}
 		else {
 			float f = MC.player.distanceTo(e) / 20F;
@@ -156,6 +164,6 @@ public final class PlayerEspHack extends Hack implements UpdateListener,
 			rgb = new float[] {r, g, 0};
 		}
 
-		return RenderUtils.toIntColor(rgb, 0.5F);
+		return RenderUtils.toIntColor(rgb, alpha.getValueF());
 	}
 }

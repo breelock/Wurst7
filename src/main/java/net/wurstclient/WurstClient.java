@@ -18,6 +18,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -47,6 +48,7 @@ import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.util.DiscordRPC;
 import net.wurstclient.util.json.JsonException;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,7 @@ public enum WurstClient
     public static final Logger log = LoggerFactory.getLogger(WurstClient.class);
     public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
-	
+
 	public static final String VERSION = "7.48.1";
 	public static final String MC_VERSION = "1.20.1";
 	private static final String DsRpcClientID = "1388520259534983238";
@@ -175,6 +177,16 @@ public enum WurstClient
 				log.error(e.toString());
             }
         }
+	}
+
+	public static int floatRgbToArgb(float[] rgb, float alpha)
+	{
+		int r = Math.round(rgb[0] * 255);
+		int g = Math.round(rgb[1] * 255);
+		int b = Math.round(rgb[2] * 255);
+		int a = Math.round(alpha * 255);
+
+		return (a << 24) | (r << 16) | (g << 8) | b;
 	}
 
 	private boolean isDotPressed() {

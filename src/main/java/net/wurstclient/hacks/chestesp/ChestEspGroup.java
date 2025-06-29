@@ -49,6 +49,11 @@ public abstract class ChestEspGroup
 	{
 		return color.getColorI(alpha);
 	}
+
+	public int getColorI(float alpha)
+	{
+		return color.getColorI(alpha);
+	}
 	
 	public List<Box> getBoxes()
 	{
