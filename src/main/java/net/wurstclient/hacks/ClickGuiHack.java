@@ -24,22 +24,22 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 public final class ClickGuiHack extends Hack
 {
 	private final ColorSetting bgColor =
-		new ColorSetting("Background", "Background color", new Color(0x404040));
+		new ColorSetting("Background", "Background color", new Color(0x1A1A1A));
 	
 	private final ColorSetting acColor =
-		new ColorSetting("Accent", "Accent color", new Color(0x101010));
+		new ColorSetting("Accent", "Accent color", new Color(0x1A1A1A));
 
 	private final ColorSetting mainColor =
-			new ColorSetting("Main", "Main color", new Color(0.34f, 0.35f, 0.90f));
+			new ColorSetting("Main", "Main color", new Color(0xFF0000));
 	
 	private final ColorSetting txtColor =
 		new ColorSetting("Text", "Text color", new Color(0xF0F0F0));
 	
 	private final SliderSetting opacity = new SliderSetting("Opacity",
-		0.5, 0.10, 1, 0.01, ValueDisplay.PERCENTAGE);
+		0.8, 0.10, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting ttOpacity = new SliderSetting("Tooltip opacity",
-		0.75, 0.10, 1, 0.01, ValueDisplay.PERCENTAGE);
+		0.8, 0.10, 1, 0.01, ValueDisplay.PERCENTAGE);
 	
 	private final SliderSetting maxHeight = new SliderSetting("Max height",
 		"Maximum window height\n" + "0 = no limit", 200, 0, 1000, 50,

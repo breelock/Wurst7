@@ -30,12 +30,8 @@ import net.wurstclient.command.CmdList;
 import net.wurstclient.command.CmdProcessor;
 import net.wurstclient.command.Command;
 import net.wurstclient.event.EventManager;
-import net.wurstclient.events.ChatOutputListener;
-import net.wurstclient.events.GUIRenderListener;
+import net.wurstclient.events.*;
 import net.wurstclient.events.GUIRenderListener.GUIRenderEvent;
-import net.wurstclient.events.KeyPressListener;
-import net.wurstclient.events.PostMotionListener;
-import net.wurstclient.events.PreMotionListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.hud.IngameHUD;
@@ -133,11 +129,12 @@ public enum WurstClient
 		
 		cmdProcessor = new CmdProcessor(cmds);
 		eventManager.add(ChatOutputListener.class, cmdProcessor);
-		
+
 		KeybindProcessor keybindProcessor =
 			new KeybindProcessor(hax, keybinds, cmdProcessor);
 		eventManager.add(KeyPressListener.class, keybindProcessor);
-		
+		eventManager.add(MousePressListener.class, keybindProcessor);
+
 		hud = new IngameHUD();
 		eventManager.add(GUIRenderListener.class, hud);
 		

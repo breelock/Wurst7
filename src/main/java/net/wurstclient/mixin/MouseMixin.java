@@ -7,6 +7,7 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.events.MousePressListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,5 +42,11 @@ public class MouseMixin
 		EventManager.fire(event);
 		cursorDeltaX = event.getDeltaX();
 		cursorDeltaY = event.getDeltaY();
+	}
+
+	@Inject(at = @At("HEAD"), method = "onMouseButton(JIII)V")
+	private void onMouseButton(long windowHandle, int button, int action, int modifiers, CallbackInfo ci)
+	{
+		EventManager.fire(new MousePressListener.MousePressEvent(button, action, modifiers));
 	}
 }

@@ -1,4 +1,8 @@
 {
+  "description.wurst.hack.clickpearl": "Uses an ender pearl on bind. The ender pearl should be in your hotbar.",
+  "description.wurst.hack.autofriends": "Automatically adds your teammates (Skywars, Bedwars, etc.) to your friends list. It works by detecting the text indicating the start of the game, and then searches for players within a specified perimeter.",
+  "description.wurst.hack.autotooldrop": "Automatically drops the worst tools from the inventory.",
+  "description.wurst.hack.autoyleave": "Automatically leaves the server if the player reaches a certain value on the Y axis, i.e. falls from a height.",
   "description.wurst.hack.aimassist": "Helps you aim at nearby entities.",
   "description.wurst.setting.aimassist.fov": "Field Of View - how far away from your crosshair an entity can be before it's ignored.\n360° = aims at entities all around you.",
   "description.wurst.setting.aimassist.ignore_mouse_input": "Ignores some of your mouse input while AimAssist is aiming. This makes it harder for you to accidentally aim away from the target.",

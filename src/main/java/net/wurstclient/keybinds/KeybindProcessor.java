@@ -7,6 +7,7 @@
  */
 package net.wurstclient.keybinds;
 
+import net.wurstclient.events.MousePressListener;
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.gui.screen.Screen;
@@ -19,7 +20,7 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.hack.HackList;
 import net.wurstclient.util.ChatUtils;
 
-public final class KeybindProcessor implements KeyPressListener
+public final class KeybindProcessor implements KeyPressListener, MousePressListener
 {
 	private final HackList hax;
 	private final KeybindList keybinds;
@@ -31,6 +32,24 @@ public final class KeybindProcessor implements KeyPressListener
 		this.hax = hax;
 		this.keybinds = keybinds;
 		this.cmdProcessor = cmdProcessor;
+	}
+
+	@Override
+	public void onMousePress(MousePressEvent event)
+	{
+		if (event.getAction() != 1)
+			return;
+
+		Screen screen = WurstClient.MC.currentScreen;
+		if (screen != null)
+			return;
+
+		String keyName = InputUtil.Type.MOUSE.createFromCode(event.getButton()).getTranslationKey();
+		String cmds = keybinds.getCommands(keyName);
+		if (cmds == null)
+			return;
+
+		processCmds(cmds);
 	}
 	
 	@Override

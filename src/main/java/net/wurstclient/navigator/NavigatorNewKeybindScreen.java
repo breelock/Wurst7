@@ -93,7 +93,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		{
 			selectedKey =
 				InputUtil.fromKeyCode(keyCode, scanCode).getTranslationKey();
-			okButton.active = !selectedKey.equals("key.keyboard.unknown");
+			okButton.active = !selectedKey.equals("key.mouse.unknown") && !selectedKey.equals("key.keyboard.unknown");
 			
 		}else if(keyCode == GLFW.GLFW_KEY_ESCAPE
 			|| keyCode == GLFW.GLFW_KEY_BACKSPACE)
@@ -103,11 +103,14 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	@Override
 	protected void onMouseClick(double x, double y, int button)
 	{
-		// back button
-		if(button == GLFW.GLFW_MOUSE_BUTTON_4)
+		if (choosingKey)
 		{
-			client.setScreen(parent);
-			return;
+			String chKey = InputUtil.Type.MOUSE.createFromCode(button).getTranslationKey();
+			if (!chKey.equals("key.mouse.left") && !chKey.equals("key.mouse.right"))
+			{
+				selectedKey = chKey;
+				okButton.active = !selectedKey.equals("key.mouse.unknown") && !selectedKey.equals("key.keyboard.unknown");
+			}
 		}
 		
 		// commands
@@ -127,7 +130,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 			text = "Now press the key that should trigger this keybind.";
 			if(!selectedKey.equals("key.keyboard.unknown"))
 			{
-				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "");
+				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "").replace("key.mouse", "");
 				String commands =
 					WurstClient.INSTANCE.getKeybinds().getCommands(selectedKey);
 				if(commands != null)
