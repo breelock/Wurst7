@@ -135,7 +135,6 @@ public class DiscordRPC {
             RandomAccessFile pipe = findDiscordPipe();
             if (pipe != null)
                 return pipe;
-            System.out.println("Waiting for discord...");
             try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
         }
     }

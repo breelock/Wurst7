@@ -7,8 +7,11 @@
  */
 package net.wurstclient.mixin;
 
+import net.wurstclient.hacks.AspectRatioHack;
+import org.joml.Matrix4f;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,6 +34,34 @@ import net.wurstclient.hacks.FullbrightHack;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
 {
+	@Shadow
+	private float zoom;
+
+	@Shadow
+	private float zoomX;
+
+	@Shadow
+	private float zoomY;
+
+	@Shadow
+	private float viewDistance;
+
+	@Inject(method = "getBasicProjectionMatrix", at = @At("TAIL"), cancellable = true)
+	public void getBasicProjectionMatrixHook(double fov, CallbackInfoReturnable<Matrix4f> cir) {
+		AspectRatioHack h = WurstClient.INSTANCE.getHax().aspectRatioHack;
+		if (h.isEnabled())
+		{
+			MatrixStack matrixStack = new MatrixStack();
+			matrixStack.peek().getPositionMatrix().identity();
+			if (zoom != 1.0f) {
+				matrixStack.translate(zoomX, -zoomY, 0.0f);
+				matrixStack.scale(zoom, zoom, 1.0f);
+			}
+			matrixStack.peek().getPositionMatrix().mul(new Matrix4f().setPerspective((float) (fov * 0.01745329238474369), h.aspectRatio.getValueF(), 0.05f, viewDistance * 4.0f));
+			cir.setReturnValue(matrixStack.peek().getPositionMatrix());
+		}
+	}
+
 	@Unique
 	private boolean cancelNextBobView;
 	
