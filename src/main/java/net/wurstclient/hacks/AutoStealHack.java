@@ -67,21 +67,25 @@ public final class AutoStealHack extends Hack
 		addSetting(checkTitle);
 	}
 	
-	public void steal(HandledScreen<?> screen, int rows)
+	public void steal(HandledScreen<?> screen, int rows, boolean fromBtn)
 	{
-		startClickingSlots(screen, 0, rows * 9, true);
+		startClickingSlots(screen, 0, rows * 9, true, fromBtn);
 	}
 	
-	public void store(HandledScreen<?> screen, int rows)
+	public void store(HandledScreen<?> screen, int rows, boolean fromBtn)
 	{
-		startClickingSlots(screen, rows * 9, rows * 9 + 36, false);
+		startClickingSlots(screen, rows * 9, rows * 9 + 36, false, fromBtn);
 	}
 	
 	private void startClickingSlots(HandledScreen<?> screen, int from, int to,
-		boolean steal)
+		boolean steal, boolean fromBtn)
 	{
-		if(thread != null && thread.isAlive())
-			return;
+		if (thread != null && thread.isAlive()) {
+			if (fromBtn && !steal)
+				return;
+			else
+				thread.interrupt();
+		}
 		
 		thread = new Thread(() -> shiftClickSlots(screen, from, to, steal),
 			"AutoSteal");
@@ -95,6 +99,7 @@ public final class AutoStealHack extends Hack
 	{
 		shit.clear();
 		boolean isShitChest = true;
+		boolean firstRun = true;
 
 		List<Slot> slots = IntStream.range(from, to).mapToObj(i -> screen.getScreenHandler().slots.get(i)).toList();
 		
@@ -195,19 +200,29 @@ public final class AutoStealHack extends Hack
                 }
 
             boolean allEmpty = true;
+			boolean fullEmpty = true;
 
             for (Slot slot : slots) {
-                if (!slot.getStack().isEmpty() && !shit.contains(slot.getStack())) {
-                    allEmpty = false;
-                    break;
+                if (!slot.getStack().isEmpty()) {
+                    fullEmpty = false;
+					if (!shit.contains(slot.getStack())) {
+						allEmpty = false;
+						break;
+					}
                 }
             }
+
+			if (fullEmpty && firstRun && isShitChest) {
+				// firstRun = false;
+				continue;
+			}
 
             if (allEmpty) {
                 if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)
                     MC.execute(() -> MC.player.closeHandledScreen());
                 break;
             }
+			firstRun = false;
         }
 	}
 	

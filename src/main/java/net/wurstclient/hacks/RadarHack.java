@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.awt.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -18,11 +19,13 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.clickgui.Window;
 import net.wurstclient.clickgui.components.RadarComponent;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.settings.filterlists.EntityFilterList;
@@ -40,6 +43,12 @@ public final class RadarHack extends Hack implements UpdateListener
 		"Radius in blocks.", 100, 1, 100, 1, ValueDisplay.INTEGER);
 	private final CheckboxSetting rotate =
 		new CheckboxSetting("Rotate with player", true);
+
+	public final ColorSetting arrowColor =
+			new ColorSetting("Arrow main color", "Arrow main color", new Color(0x000000));
+
+	public final ColorSetting arrowOutline =
+			new ColorSetting("Arrow outline color", "Arrow outline color", new Color(0x404040));
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),
@@ -57,10 +66,12 @@ public final class RadarHack extends Hack implements UpdateListener
 	public RadarHack()
 	{
 		super("Radar");
-		
+
 		setCategory(Category.RENDER);
 		addSetting(radius);
 		addSetting(rotate);
+		addSetting(arrowColor);
+		addSetting(arrowOutline);
 		addSetting(onlyPlayers);
 		entityFilters.forEach(this::addSetting);
 		

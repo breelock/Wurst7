@@ -71,7 +71,7 @@ public final class RadarComponent extends Component
 				(180 + player.getYaw()) * MathHelper.RADIANS_PER_DEGREE));
 		
 		// arrow
-		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2);
+		ClickGuiIcons.drawRadarArrow(context, -2, -2, 2, 2, hack);
 		
 		matrixStack.pop();
 		Vec3d lerpedPlayerPos = EntityUtils.getLerpedPos(player, partialTicks);

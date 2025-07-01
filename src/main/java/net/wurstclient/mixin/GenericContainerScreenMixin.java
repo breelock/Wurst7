@@ -53,12 +53,12 @@ public abstract class GenericContainerScreenMixin
 		{
 			addDrawableChild(ButtonWidget
 				.builder(Text.literal("Steal"),
-					b -> autoSteal.steal(this, rows))
+					b -> autoSteal.steal(this, rows, true))
 				.dimensions(x + backgroundWidth - 108, y + 4, 50, 12).build());
 			
 			addDrawableChild(ButtonWidget
 				.builder(Text.literal("Store"),
-					b -> autoSteal.store(this, rows))
+					b -> autoSteal.store(this, rows, true))
 				.dimensions(x + backgroundWidth - 56, y + 4, 50, 12).build());
 		}
 
@@ -67,10 +67,10 @@ public abstract class GenericContainerScreenMixin
 			if (autoSteal.checkTitle.isChecked()) {
 				String titleStr = this.title.getString().toLowerCase();
 				if (titleStr.contains("chest") || titleStr.contains("сундук"))
-					autoSteal.steal(this, rows);
+					autoSteal.steal(this, rows, false);
 			}
 			else
-				autoSteal.steal(this, rows);
+				autoSteal.steal(this, rows, false);
 		}
 
 	}

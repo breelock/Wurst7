@@ -9,6 +9,7 @@ package net.wurstclient.clickgui;
 
 import net.minecraft.client.gui.DrawContext;
 import net.wurstclient.WurstClient;
+import net.wurstclient.hacks.RadarHack;
 import net.wurstclient.util.RenderUtils;
 
 public enum ClickGuiIcons
@@ -49,20 +50,19 @@ public enum ClickGuiIcons
 	}
 	
 	public static void drawRadarArrow(DrawContext context, float x1, float y1,
-		float x2, float y2)
+	  	float x2, float y2, RadarHack hack)
 	{
 		float x3 = x1 + (x2 - x1) / 2;
 		float y3 = y1 + (y2 - y1) * 0.75F;
 		
 		// arrow
 		ClickGui gui = WurstClient.INSTANCE.getGui();
-		int arrowColor =
-			RenderUtils.toIntColor(gui.getAcColor(), gui.getOpacity());
+		int arrowColor = hack.arrowColor.getColorI(gui.getOpacity());
 		float[][] arrowVertices = {{x3, y1}, {x1, y2}, {x3, y3}, {x2, y2}};
 		RenderUtils.fillQuads2D(context, arrowVertices, arrowColor);
 		
 		// outline
-		int outlineColor = 0x80101010;
+		int outlineColor = hack.arrowOutline.getColorI(gui.getOpacity());
 		RenderUtils.drawLineStrip2D(context, arrowVertices, outlineColor);
 	}
 	
