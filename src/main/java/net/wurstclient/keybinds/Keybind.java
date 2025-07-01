@@ -56,6 +56,6 @@ public class Keybind implements Comparable<Keybind>
 	@Override
 	public String toString()
 	{
-		return key.replace("key.keyboard.", "") + " -> " + commands;
+		return key.replace("key.keyboard.", "").replace("key.", "") + " -> " + commands;
 	}
 }

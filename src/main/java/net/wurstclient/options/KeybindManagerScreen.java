@@ -183,7 +183,7 @@ public final class KeybindManagerScreen extends Screen
 			TextRenderer tr = client.textRenderer;
 			
 			String keyText =
-				"Key: " + keybind.getKey().replace("key.keyboard.", "");
+				"Key: " + keybind.getKey().replace("key.keyboard.", "").replace("key.", "");
 			context.drawText(tr, keyText, x + 3, y + 3, 0xA0A0A0, false);
 			
 			String cmdText = "Commands: " + keybind.getCommands();

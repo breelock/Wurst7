@@ -118,10 +118,11 @@ public final class BindsCmd extends Command
 	private String parseKey(String displayKey) throws CmdSyntaxError
 	{
 		String key = displayKey.toLowerCase();
-		
-		String prefix = "key.keyboard.";
-		if(!key.startsWith(prefix))
-			key = prefix + key;
+
+		if(!key.startsWith("key.keyboard.") && !key.startsWith("key.mouse.") && !key.startsWith("mouse."))
+			key = "key.keyboard." + key;
+		else if (key.startsWith("mouse."))
+			key = "key." + key;
 		
 		try
 		{
@@ -130,7 +131,7 @@ public final class BindsCmd extends Command
 			
 		}catch(IllegalArgumentException e)
 		{
-			throw new CmdSyntaxError("Unknown key: " + displayKey);
+			throw new CmdSyntaxError("Unknown key: " + displayKey + " [" + key + "]");
 		}
 	}
 	

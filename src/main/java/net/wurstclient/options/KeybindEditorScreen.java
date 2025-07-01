@@ -104,7 +104,7 @@ public final class KeybindEditorScreen extends Screen
 			0xffffff);
 		
 		context.drawTextWithShadow(textRenderer,
-			"Key: " + key.replace("key.keyboard.", ""), width / 2 - 100, 47,
+			"Key: " + key.replace("key.keyboard.", "").replace("key.", ""), width / 2 - 100, 47,
 			0xa0a0a0);
 		context.drawTextWithShadow(textRenderer, "Commands (separated by ';')",
 			width / 2 - 100, 87, 0xa0a0a0);

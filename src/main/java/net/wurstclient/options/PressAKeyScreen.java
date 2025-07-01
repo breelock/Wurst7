@@ -37,6 +37,17 @@ public class PressAKeyScreen extends Screen
 		client.setScreen((Screen)prevScreen);
 		return super.keyPressed(keyCode, scanCode, int_3);
 	}
+
+	@Override
+	public boolean mouseClicked(double x, double y, int button)
+	{
+		String chKey = InputUtil.Type.MOUSE.createFromCode(button).getTranslationKey();
+		if (!chKey.equals("key.mouse.left") && !chKey.equals("key.mouse.right"))
+			prevScreen.setKey(chKey);
+
+		client.setScreen((Screen)prevScreen);
+		return super.mouseClicked(x, y, button);
+	}
 	
 	private String getKeyName(int keyCode, int scanCode)
 	{

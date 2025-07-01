@@ -175,7 +175,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 			drawBox(context, x1, y1, x2, y2, buttonColor);
 			
 			// text
-			context.drawTextWithShadow(tr, key.replace("key.keyboard.", "")
+			context.drawTextWithShadow(tr, key.replace("key.keyboard.", "").replace("key.", "")
 				+ ": " + keybind.getDescription(), x1 + 1, y1 + 1, txtColor);
 			context.drawTextWithShadow(tr, keybind.getCommand(), x1 + 1,
 				y1 + 1 + tr.fontHeight, txtColor);

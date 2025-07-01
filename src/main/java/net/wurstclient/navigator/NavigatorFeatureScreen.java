@@ -180,7 +180,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						if(noKeybindsSet)
 							noKeybindsSet = false;
 						text +=
-							"\n" + keybind.getKey().replace("key.keyboard.", "")
+							"\n" + keybind.getKey().replace("key.keyboard.", "").replace("key.", "")
 								+ ": " + keybindDescription;
 						existingKeybinds.put(keybind.getKey(),
 							new PossibleKeybind(command, keybindDescription));
@@ -191,7 +191,7 @@ public final class NavigatorFeatureScreen extends NavigatorScreen
 						if(noKeybindsSet)
 							noKeybindsSet = false;
 						text +=
-							"\n" + keybind.getKey().replace("key.keyboard.", "")
+							"\n" + keybind.getKey().replace("key.keyboard.", "").replace("key.", "")
 								+ ": " + "Toggle " + feature.getName();
 						existingKeybinds.put(keybind.getKey(),
 							new PossibleKeybind(command,

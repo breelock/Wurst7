@@ -128,9 +128,9 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		if(choosingKey)
 		{
 			text = "Now press the key that should trigger this keybind.";
-			if(!selectedKey.equals("key.keyboard.unknown"))
+			if(!selectedKey.equals("key.keyboard.unknown") && !selectedKey.equals("key.mouse.unknown"))
 			{
-				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "").replace("key.mouse", "");
+				text += "\n\nKey: " + selectedKey.replace("key.keyboard.", "").replace("key.", "");
 				String commands =
 					WurstClient.INSTANCE.getKeybinds().getCommands(selectedKey);
 				if(commands != null)
