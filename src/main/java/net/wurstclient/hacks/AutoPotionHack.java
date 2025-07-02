@@ -17,6 +17,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.Rotation;
@@ -28,6 +29,9 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 	private final SliderSetting health = new SliderSetting("Health",
 		"Throws a potion when your health reaches this value or falls below it.",
 		6, 0.5, 9.5, 0.5, ValueDisplay.DECIMAL.withSuffix(" hearts"));
+
+	private final CheckboxSetting moveFromInv = new CheckboxSetting("Move potion from inventory",
+			"Move potion from inventory", false);
 	
 	private int timer;
 	
@@ -37,6 +41,7 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 		
 		setCategory(Category.COMBAT);
 		addSetting(health);
+		addSetting(moveFromInv);
 	}
 	
 	@Override
@@ -90,14 +95,17 @@ public final class AutoPotionHack extends Hack implements UpdateListener
 			
 			return;
 		}
-		
-		// search potion in inventory
-		int potionInInventory = findPotion(9, 36);
-		
-		// move potion in inventory to hotbar
-		if(potionInInventory != -1)
-			IMC.getInteractionManager()
-				.windowClick_QUICK_MOVE(potionInInventory);
+
+		if (!WURST.getHax().autoSwordHack.isEnabled() && moveFromInv.isChecked())
+		{
+			// search potion in inventory
+			int potionInInventory = findPotion(9, 36);
+
+			// move potion in inventory to hotbar
+			if(potionInInventory != -1)
+				IMC.getInteractionManager()
+						.windowClick_QUICK_MOVE(potionInInventory);
+		}
 	}
 	
 	private int findPotion(int startSlot, int endSlot)

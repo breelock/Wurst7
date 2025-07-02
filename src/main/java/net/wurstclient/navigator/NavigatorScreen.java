@@ -115,7 +115,7 @@ public abstract class NavigatorScreen extends Screen
 		// scrollbar
 		if(!scrollbarLocked)
 		{
-			scroll += verticalAmount * 4;
+			scroll += (int) (verticalAmount * 15);
 			
 			if(scroll > 0)
 				scroll = 0;

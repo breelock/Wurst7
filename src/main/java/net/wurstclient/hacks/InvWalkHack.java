@@ -13,6 +13,7 @@ import java.util.Arrays;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.AbstractInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.option.KeyBinding;
@@ -45,6 +46,9 @@ public final class InvWalkHack extends Hack implements UpdateListener
 	
 	private final CheckboxSetting allowJump =
 		new CheckboxSetting("Allow jump key", true);
+
+	private final CheckboxSetting disallowChestScreen =
+			new CheckboxSetting("Disallow containers (chests, shulkers) screen", true);
 	
 	public InvWalkHack()
 	{
@@ -55,6 +59,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		addSetting(allowSneak);
 		addSetting(allowSprint);
 		addSetting(allowJump);
+		addSetting(disallowChestScreen);
 	}
 	
 	@Override
@@ -104,10 +109,13 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		
 		if(allowClickGUI.isChecked() && screen instanceof ClickGuiScreen)
 			return true;
-		
-		if(allowOther.isChecked() && screen instanceof HandledScreen
-			&& !hasTextBox(screen))
-			return true;
+
+		if(allowOther.isChecked() && screen instanceof HandledScreen && !hasTextBox(screen)) {
+			if (disallowChestScreen.isChecked() && !(screen instanceof GenericContainerScreen))
+				return true;
+			else if (!disallowChestScreen.isChecked())
+				return true;
+		}
 		
 		return false;
 	}

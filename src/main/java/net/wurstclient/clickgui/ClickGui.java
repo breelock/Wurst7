@@ -224,7 +224,7 @@ public final class ClickGui
 	
 	public void handleMouseScroll(double mouseX, double mouseY, double delta)
 	{
-		int dWheel = (int)delta * 4;
+		int dWheel = (int)delta * 10;
 		if(dWheel == 0)
 			return;
 		

@@ -53,7 +53,6 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 	
 	private Screen tempCurrentScreen;
 	private boolean hideNextItemUse;
-	private boolean clip = false;
 	
 	public ClientPlayerEntityMixin(WurstClient wurst, ClientWorld world,
 		GameProfile profile)

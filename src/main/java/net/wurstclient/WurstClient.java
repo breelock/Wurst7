@@ -18,7 +18,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -44,16 +43,12 @@ import net.wurstclient.settings.SettingsFile;
 import net.wurstclient.update.ProblematicResourcePackDetector;
 import net.wurstclient.util.DiscordRPC;
 import net.wurstclient.util.json.JsonException;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public enum WurstClient
 {
 	INSTANCE;
 
-    public static final Logger log = LoggerFactory.getLogger(WurstClient.class);
     public static MinecraftClient MC;
 	public static IMinecraftClient IMC;
 
@@ -171,7 +166,7 @@ public enum WurstClient
             try {
                 new DiscordRPC(DsRpcClientID).run();
             } catch (Exception e) {
-				log.error(e.toString());
+				System.err.println(e);
             }
         }
 	}
