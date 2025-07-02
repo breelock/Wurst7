@@ -10,14 +10,19 @@ package net.wurstclient.hacks;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 
 @SearchTags({"RainbowGUI", "rainbow ui", "rainbow gui", "rgb"})
 public final class RainbowUiHack extends Hack
 {
+	public final CheckboxSetting rainbowAccentColor = new CheckboxSetting("Rainbow accent color",
+			"Rainbow accent color", false);
+
 	public RainbowUiHack()
 	{
 		super("RainbowUI");
 		setCategory(Category.FUN);
+		addSetting(rainbowAccentColor);
 	}
 	
 	// See ClickGui.updateColors()

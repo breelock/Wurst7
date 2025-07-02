@@ -48,7 +48,7 @@ public final class RadarHack extends Hack implements UpdateListener
 			new ColorSetting("Arrow main color", "Arrow main color", new Color(0x000000));
 
 	public final ColorSetting arrowOutline =
-			new ColorSetting("Arrow outline color", "Arrow outline color", new Color(0x404040));
+			new ColorSetting("Arrow outline color", "Arrow outline color", new Color(0x646464));
 	
 	private final EntityFilterList entityFilters =
 		new EntityFilterList(FilterPlayersSetting.genericVision(false),

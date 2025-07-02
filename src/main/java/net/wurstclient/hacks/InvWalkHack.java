@@ -48,7 +48,7 @@ public final class InvWalkHack extends Hack implements UpdateListener
 		new CheckboxSetting("Allow jump key", true);
 
 	private final CheckboxSetting disallowChestScreen =
-			new CheckboxSetting("Disallow containers (chests, shulkers) screen", true);
+			new CheckboxSetting("Disallow containers (chests, shulkers) screens", true);
 	
 	public InvWalkHack()
 	{

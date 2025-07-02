@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import net.wurstclient.hacks.RainbowUiHack;
 import org.lwjgl.glfw.GLFW;
 
 import com.google.gson.JsonElement;
@@ -589,19 +590,30 @@ public final class ClickGui
 		
 		opacity = clickGui.getOpacity();
 		ttOpacity = clickGui.getTooltipOpacity();
-		float[] mcl = clickGui.getMainColor();
-		guiColor = new float[] {mcl[0], mcl[1], mcl[2], getOpacity()};
-		intGuiColor = floatRgbToArgb(guiColor, getOpacity());
 		bgColor = clickGui.getBackgroundColor();
 		txtColor = clickGui.getTextColor();
 		maxHeight = clickGui.getMaxHeight();
 		maxSettingsHeight = clickGui.getMaxSettingsHeight();
-		
-		if(WurstClient.INSTANCE.getHax().rainbowUiHack.isEnabled())
-			acColor = RenderUtils.getRainbowColor();
-		else
+
+		float[] mcl = clickGui.getMainColor();
+		RainbowUiHack h = WurstClient.INSTANCE.getHax().rainbowUiHack;
+		if(h.isEnabled()) {
+			float[] rColor = RenderUtils.getRainbowColor();
+			if (h.rainbowAccentColor.isChecked())
+				acColor = rColor;
+			else
+				acColor = clickGui.getAccentColor();
+
+			guiColor = new float[] {rColor[0], rColor[1], rColor[2], getOpacity()};
+        }
+
+		else {
 			acColor = clickGui.getAccentColor();
-	}
+			guiColor = new float[] {mcl[0], mcl[1], mcl[2], getOpacity()};
+        }
+
+        intGuiColor = floatRgbToArgb(guiColor, getOpacity());
+    }
 	
 	private void renderWindow(DrawContext context, Window window, int mouseX,
 		int mouseY, float partialTicks)

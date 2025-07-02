@@ -52,18 +52,9 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		2, 1, 20, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 
-	private final SliderSetting releaseTime = new SliderSetting("Release time",
-			"Time until AutoSword will switch back from the weapon to the"
-					+ " previously selected slot.\n\n"
-					+ "Only works when \u00a7lSwitch back\u00a7r is checked.",
-			10, 1, 200, 1,
-			ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
-
 	private final CheckboxSetting dropSwords = new CheckboxSetting("Drop swords", "Throw away the worst swords", true);
 
-	private int oldSlot;
 	private int timer;
-
 	private boolean invIsOpen = false;
 	
 	public AutoSwordHack()
@@ -72,14 +63,12 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		setCategory(Category.COMBAT);
 		addSetting(swapWhileMoving);
 		addSetting(delay);
-		addSetting(releaseTime);
 		addSetting(dropSwords);
 	}
 	
 	@Override
 	protected void onEnable()
 	{
-		oldSlot = -1;
 		timer = 0;
 		EVENTS.add(UpdateListener.class, this);
 		EVENTS.add(PacketOutputListener.class, this);
@@ -252,15 +241,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		if(bestSlot == -1)
 			return;
 
-		// save old slot
-		if(oldSlot == -1)
-			oldSlot = MC.player.getInventory().selectedSlot;
-
 		// set slot
 		MC.player.getInventory().selectedSlot = bestSlot;
-
-		// start timer
-		timer = releaseTime.getValueI();
 	}
 
 	private float getValue(ItemStack stack, Entity entity)
