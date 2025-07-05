@@ -51,6 +51,7 @@ public final class CfgCmd extends Command
 			".cfg load <name>",
 			".cfg save <name>",
 			".cfg list [<page>]",
+			".cfg delete",
 			".cfg dir",
 			"Configs are saved in '" + WURST.cfgDir + "'.");
 	}
@@ -75,6 +76,10 @@ public final class CfgCmd extends Command
 			cfgList(args);
 			break;
 
+			case "delete":
+			deleteCfg(args);
+			break;
+
 			case "dir":
 			openCfgDir();
 			break;
@@ -92,6 +97,33 @@ public final class CfgCmd extends Command
             throw new RuntimeException(e);
         }
     }
+
+	private void deleteCfg(String[] args) throws CmdException
+	{
+		if(args.length != 2)
+			throw new CmdSyntaxError();
+
+		String name = parseFileName(args[1]);
+
+		try {
+			String fullPath = new File(WURST.cfgDir.toFile(), name).getAbsolutePath();
+			File file = new File(fullPath);
+			if(!(file.exists() && !file.isDirectory())) {
+				throw new NoSuchFileException(file.getPath());
+			}
+			boolean deleted = file.delete();
+			if (deleted)
+				ChatUtils.message("Cfg '" + name.replace(".json", "") + "' deleted");
+			else
+				throw new CmdError("Can't delete '" + name.replace(".json", "") + "' cfg");
+		}
+		catch (NoSuchFileException ex) {
+			throw new CmdError("Cfg '" + name.replace(".json", "") + "' doesn't exist.");
+		}
+		catch (Exception ex) {
+			throw new CmdError("Can't delete '" + name.replace(".json", "") + "' cfg: " + ex);
+		}
+	}
 	
 	private void loadCfg(String[] args) throws CmdException
 	{

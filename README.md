@@ -2,25 +2,39 @@
 
 ![Wurst Client logo](/src/main/resources/assets/wurst/wurst_128.png)
 
-The client version is designed for playing Skywars/Bedwars. 
+The client version is designed for playing Skywars/Bedwars. But of course, you can use this client for more than just that.. 
 
-- **Downloads:** [https://github.com/breelock/Wurst7/releases](https://github.com/breelock/Wurst7/releases)
+- **Download:** [https://github.com/breelock/Wurst7/releases](https://github.com/breelock/Wurst7/releases)
 
-- **Installation guide:** [https://www.wurstclient.net/tutorials/how-to-install/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2Ftutorials%2Fhow-to-install%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
+- **Installation guide:** [https://www.wurstclient.net/tutorials/how-to-install/wurst-7/](https://www.wurstclient.net/tutorials/how-to-install/wurst-7/)
 
-- **Feature list:** [https://www.wurstclient.net/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
-
-- **Wiki:** [https://wurst.wiki/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwurst.wiki%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
-
-- **Forum:** [https://wurstforum.net/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwurstforum.net%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)	
-
-- **Twitter/X:** [https://x.com/Wurst_Imperium](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://x.com/Wurst_Imperium)
-
-- **YouTube:** [https://www.youtube.com/@Alexander01998](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://www.youtube.com/@Alexander01998)
-
-- **Donations/Perks:** [https://ko-fi.com/wurst](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https://ko-fi.com/wurst)
+- **Original feature list:** [https://www.wurstclient.net/](https://go.wimods.net/from/github.com/Wurst-Imperium/Wurst7?to=https%3A%2F%2Fwww.wurstclient.net%2F%3Futm_source%3DGitHub%26utm_medium%3DWurst7%2Brepo)
 
 - **Original client**: [https://github.com/Wurst-Imperium/Wurst7](https://github.com/Wurst-Imperium/Wurst7)
+
+## Difference from the original version
+
+```
+- Normal .cfg system (All settings just in one .json file)
+- AspectRatio
+- ClickPearl
+- AutoFriends (for you minigames teammates)
+- AutoYLeave
+- AutoToolDrop
+- RadarHack only players mode
+- AutoArmor drop worst armor
+- AutoDrop disable after drop
+- Anti anti-cheat flag system on AutoArmor, AutoSword, AutoDrop, etc.
+- Now you can use mouse binds
+- Enhanced SafeWalk, now you can control the permitted height
+- Enhanced AutoSteal
+- Enhanced PlayerEsp, ChestEsp, ItemEsp, etc.
+- Enhanced GUI, custom GUI color, custom wurst logo
+- Discord RPC
+- Deleted some trash
+- Slightly improved translation
+- Some small fixes
+```
 
 ## Installation
 
