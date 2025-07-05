@@ -176,7 +176,7 @@ public final class CfgCmd extends Command
 
 					for (Map.Entry<String, JsonElement> settingEntry : e.getValue().getAsJsonObject().entrySet()) {
 						Map<String, Setting> settings = feature.getSettings();
-						String key = settingEntry.getKey().toLowerCase();git
+						String key = settingEntry.getKey().toLowerCase();
 						if(!settings.containsKey(key))
 							continue;
 
