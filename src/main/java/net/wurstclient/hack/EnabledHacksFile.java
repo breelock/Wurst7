@@ -61,7 +61,7 @@ public final class EnabledHacksFile
 		save(hax);
 	}
 	
-	private void enableHacks(HackList hax, WsonArray wson)
+	public void enableHacks(HackList hax, WsonArray wson)
 	{
 		try
 		{
@@ -123,5 +123,9 @@ public final class EnabledHacksFile
 		enabledHax.map(Hack::getName).forEach(name -> json.add(name));
 		
 		return json;
+	}
+
+	public Path getPath() {
+		return path;
 	}
 }

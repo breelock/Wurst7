@@ -232,6 +232,11 @@ public final class HackList implements UpdateListener
 		enabledHacksFile.load(this);
 		eventManager.remove(UpdateListener.class, this);
 	}
+
+	public EnabledHacksFile getEnabledHacksFile()
+	{
+		return enabledHacksFile;
+	}
 	
 	public void saveEnabledHax()
 	{

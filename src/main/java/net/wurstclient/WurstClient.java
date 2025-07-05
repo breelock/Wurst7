@@ -63,6 +63,7 @@ public enum WurstClient
 	private CmdList cmds;
 	private OtfList otfs;
 	private SettingsFile settingsFile;
+	public Path cfgDir;
 	private Path settingsProfileFolder;
 	private KeybindList keybinds;
 	private ClickGui gui;
@@ -87,6 +88,7 @@ public enum WurstClient
 		MC = MinecraftClient.getInstance();
 		IMC = (IMinecraftClient)MC;
 		wurstFolder = createWurstFolder();
+		cfgDir = createCfgDir();
 		
 		Path analyticsFile = wurstFolder.resolve("analytics.json");
 		plausible = new PlausibleAnalytics(analyticsFile);
@@ -171,6 +173,10 @@ public enum WurstClient
         }
 	}
 
+	public SettingsFile getSettingsFile() {
+		return this.settingsFile;
+	}
+
 	public static int floatRgbToArgb(float[] rgb, float alpha)
 	{
 		int r = Math.round(rgb[0] * 255);
@@ -195,6 +201,20 @@ public enum WurstClient
 		RenderSystem.disableBlend();
 		EventManager.fire(new GUIRenderEvent(context, tickDelta));
 		RenderSystem.disableBlend();
+	}
+
+	private Path createCfgDir()
+	{
+		Path cfgPath = wurstFolder.resolve("cfg");
+
+		try {
+			Files.createDirectories(cfgPath);
+		}
+		catch(IOException e) {
+			throw new RuntimeException("Couldn't create .minecraft/wurst/cfg folder.", e);
+		}
+
+		return cfgPath;
 	}
 	
 	private Path createWurstFolder()

@@ -106,7 +106,7 @@ public final class KeybindsFile
 			
 		}catch(IOException | JsonException e)
 		{
-			System.out.println("Couldn't save " + path.getFileName());
+			System.out.println("Couldn't save keybinds as default: " + path.getFileName());
 			e.printStackTrace();
 		}
 	}

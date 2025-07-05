@@ -33,8 +33,8 @@ import net.wurstclient.util.json.WsonObject;
 
 public final class SettingsFile
 {
-	private final Path path;
-	private final Map<String, Feature> featuresWithSettings;
+	public final Path path;
+	public final Map<String, Feature> featuresWithSettings;
 	private boolean disableSaving;
 	
 	public SettingsFile(Path path, HackList hax, CmdList cmds, OtfList otfs)
@@ -173,5 +173,9 @@ public final class SettingsFile
 		}
 		
 		return json;
+	}
+
+	public Path getPath() {
+		return path;
 	}
 }
