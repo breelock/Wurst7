@@ -20,7 +20,7 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.InventoryUtils;
 
 @SearchTags({"auto leave", "AutoDisconnect", "auto disconnect", "AutoQuit",
-	"auto quit"})
+	"auto quit", "AutoYLeave"})
 public final class AutoLeaveHack extends Hack implements UpdateListener
 {
 	private final SliderSetting health = new SliderSetting("Health",
@@ -55,10 +55,10 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 	{
 		super("AutoLeave");
 		setCategory(Category.COMBAT);
-		addSetting(health);
 		addSetting(mode);
-		addSetting(disableAutoReconnect);
+		addSetting(health);
 		addSetting(totems);
+		addSetting(disableAutoReconnect);
 	}
 	
 	@Override

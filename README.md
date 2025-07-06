@@ -33,7 +33,7 @@ The client version is designed for playing Skywars/Bedwars. But of course, you c
 - Discord RPC
 - Deleted some trash
 - Slightly improved translation
-- Some small fixes
+- Some fixes and improvements
 ```
 
 ## Installation
