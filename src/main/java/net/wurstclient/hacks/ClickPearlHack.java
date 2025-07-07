@@ -53,12 +53,6 @@ public final class ClickPearlHack extends Hack
 	{
 		boolean skipSleep;
 
-		if (minDelay.getValueI() < 0)
-			minDelay.setValue(0);
-
-		if (maxDelay.getValueI() < 0)
-			maxDelay.setValue(0);
-
 		if (minDelay.getValueI() > maxDelay.getValueI()) {
 			int mind = minDelay.getValueI();
 			int maxd = maxDelay.getValueI();

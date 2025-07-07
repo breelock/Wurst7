@@ -1,4 +1,6 @@
 {
+  "description.wurst.hack.autoclickerright": "Customizable right mouse button auto clicker. See also AutoClickerLeft.",
+  "description.wurst.hack.autoclickerleft": "Customizable left mouse button auto clicker. See also AutoClickerRight.",
   "description.wurst.hack.aspectratio": "Allows you to stretch the screen without distorting the quality.",
   "description.wurst.hack.clickpearl": "Uses an ender pearl on bind. The ender pearl should be in your hotbar.",
   "description.wurst.hack.autofriends": "Automatically adds your teammates (Skywars, Bedwars, etc.) to your friends list. It works by detecting the text indicating the start of the game, and then searches for players within a specified perimeter.",

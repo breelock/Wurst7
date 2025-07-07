@@ -1,4 +1,6 @@
 {
+  "description.wurst.hack.autoclickerright": "Настраиваемый автокликер правой кнопкой мыши. Смотрите также AutoClickerLeft.",
+  "description.wurst.hack.autoclickerleft": "Настраиваемый автокликер левой кнопкой мыши. Смотрите также AutoClickerRight.",
   "description.wurst.hack.aspectratio": "Позволяет растягивать экран без ухудшения качества.",
   "description.wurst.hack.clickpearl": "Использует эндер пёрл по бинду. Пёрка должна лежать у вас в хотбаре.",
   "description.wurst.hack.autofriends": "Автоматически добавляет ваших тиммейтов (Skywars, Bedwars и т. д.) в список друзей. Функция работает, обнаруживая текст, указывающий на начало игры, а затем ищет игроков в пределах указанного периметра.",

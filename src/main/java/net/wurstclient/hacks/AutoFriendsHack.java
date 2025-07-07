@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-@SearchTags({"auto friends", "auto frens", "frens", "friends"})
+@SearchTags({"auto friends", "auto frens", "frens", "friends", "AutoFrens"})
 public final class AutoFriendsHack extends Hack
 {
 	private TreeSet<String> tempFriends = new TreeSet<>();

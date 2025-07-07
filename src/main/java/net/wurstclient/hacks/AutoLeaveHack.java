@@ -109,7 +109,7 @@ public final class AutoLeaveHack extends Hack implements UpdateListener
 			WURST.getHax().autoReconnectHack.setEnabled(false);
 	}
 	
-	public static enum Mode
+	private enum Mode
 	{
 		QUIT("Quit", () -> MC.world.disconnect()),
 		

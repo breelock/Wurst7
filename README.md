@@ -16,6 +16,7 @@ The client version is designed for playing Skywars/Bedwars. But of course, you c
 
 ```
 - Normal .cfg system (All settings just in one .json file)
+- AutoClicker
 - AspectRatio
 - ClickPearl
 - AutoFriends (for you minigames teammates)
