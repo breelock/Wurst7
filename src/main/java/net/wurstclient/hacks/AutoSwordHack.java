@@ -52,6 +52,10 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		2, 1, 20, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 
+	private final SliderSetting swordSlot = new SliderSetting("Sword slot",
+			"Slot in the hot bar where the sword will be placed.",
+			1, 1, 9, 1, ValueDisplay.INTEGER);
+
 	private final CheckboxSetting dropSwords = new CheckboxSetting("Drop swords", "Throw away the worst swords", true);
 
 	private int timer;
@@ -63,6 +67,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		setCategory(Category.COMBAT);
 		addSetting(swapWhileMoving);
 		addSetting(delay);
+		addSetting(swordSlot);
 		addSetting(dropSwords);
 	}
 	
@@ -112,21 +117,21 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 				}
 			}
 
-			ItemStack currentStack = inventory.getStack(0);
+			ItemStack currentStack = inventory.getStack(swordSlot.getValueI() - 1);
 			float currentSwordValue = -1;
 
 			if (!currentStack.isEmpty() && currentStack.getItem() instanceof SwordItem currentSword)
 				currentSwordValue = getSwordValue(currentStack, currentSword);
 
 			if (bestSwordSlot == -1
-					|| bestSwordSlot == 0
+					|| bestSwordSlot == swordSlot.getValueI() - 1
 					|| currentSwordValue >= bestSwordValue
 					|| inventory.getEmptySlot() == -1) {
 				break;
 			}
 
 			if (!currentStack.isEmpty()) {
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(36);
+				IMC.getInteractionManager().windowClick_QUICK_MOVE(swordSlot.getValueI() + 35);
 			}
 
 			int slotId = bestSwordSlot < 9 ? bestSwordSlot + 36 : bestSwordSlot;
@@ -138,8 +143,8 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 					player.currentScreenHandler.getSlot(slotId).getStack(), stackMap));
 
 			player.networkHandler.sendPacket(new ClickSlotC2SPacket(
-					0, revision, 36, 0, SlotActionType.PICKUP,
-					player.currentScreenHandler.getSlot(36).getStack(), stackMap));
+					0, revision, swordSlot.getValueI() + 35, 0, SlotActionType.PICKUP,
+					player.currentScreenHandler.getSlot(swordSlot.getValueI() + 35).getStack(), stackMap));
 			openServInv(false);
 		} while (false);
 
@@ -148,7 +153,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		{
 			for (int slot = 9; slot < 45; slot++) {
 				int adjusted = slot >= 36 ? slot - 36 : slot;
-				if (adjusted == 0) continue;
+				if (adjusted == swordSlot.getValueI() - 1) continue;
 				ItemStack stack = inventory.getStack(adjusted);
 
 				if (!stack.isEmpty() && isWorseOrSameSword(stack)) {
@@ -170,7 +175,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		if(player == null)
 			return false;
 
-		ItemStack equipped = player.getInventory().getStack(0);
+		ItemStack equipped = player.getInventory().getStack(swordSlot.getValueI() - 1);
 
 		// If nothing is equipped
 		if(equipped.isEmpty())

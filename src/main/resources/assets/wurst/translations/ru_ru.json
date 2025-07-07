@@ -63,7 +63,7 @@
   "description.wurst.hack.autosteal": "Автоматически забирает всё из сундуков и шалкеров которые Вы открываете.",
   "description.wurst.hack.autoswim": "Автоматически включает анимацию быстрого плаванья.",
   "description.wurst.hack.autoswitch": "Всё время переключает слоты в руке.\n\n§lProTip:§r Можно использовать это с BuildRandom когда у вас в хотбаре много разноцветной шерсти или бетона.",
-  "description.wurst.hack.autosword": "Автоматическое использование наилучшего оружия для атаки.\nСовет: Это хорошее дополнение к Killaura.",
+  "description.wurst.hack.autosword": "Автоматически перемещает меч в выбранный слот хотбара.",
   "description.wurst.hack.autotool": "Автоматически экипирует подходящий инструмент из хотбара когда Вы пытаетесь сломать блок.",
   "description.wurst.hack.autototem": "Автоматически перемещает тотемы бессмертия во вторую руку.",
   "description.wurst.hack.autowalk": "Заставляет Вас всё время идти.",

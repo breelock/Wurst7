@@ -30,6 +30,7 @@ The client version is designed for playing Skywars/Bedwars. But of course, you c
 - Enhanced AutoSteal
 - Enhanced PlayerEsp, ChestEsp, ItemEsp, etc.
 - Enhanced GUI, custom GUI color, custom wurst logo
+- Enhanced Trajectories
 - Discord RPC
 - Deleted some trash
 - Slightly improved translation

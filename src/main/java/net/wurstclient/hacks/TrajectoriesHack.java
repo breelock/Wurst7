@@ -28,6 +28,7 @@ import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.events.RenderListener;
 import net.wurstclient.hack.Hack;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ColorSetting;
 import net.wurstclient.util.BlockUtils;
 import net.wurstclient.util.EntityUtils;
@@ -48,6 +49,10 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 	private final ColorSetting blockHitColor =
 		new ColorSetting("Block Hit Color",
 			"Color of the trajectory when it hits a block.", Color.GREEN);
+
+	private final CheckboxSetting pearlFallCheck = new CheckboxSetting("Pearl fall check",
+			"Checks whether the player will fall into the void after teleporting with the ender pearl. " +
+					"If so, the trajectory will be colored in the color of a miss.", true);
 	
 	public TrajectoriesHack()
 	{
@@ -56,6 +61,7 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 		addSetting(missColor);
 		addSetting(entityHitColor);
 		addSetting(blockHitColor);
+		addSetting(pearlFallCheck);
 	}
 	
 	@Override
@@ -169,7 +175,29 @@ public final class TrajectoriesHack extends Hack implements RenderListener
 				break;
 			}
 		}
-		
+
+		// If a player falls into the void after being teleported using an ender pearl
+		if(pearlFallCheck.isChecked() && stack.getItem() instanceof EnderPearlItem && !path.isEmpty())
+		{
+			Vec3d landingPos = path.get(path.size() - 1);
+
+			double yawRad = Math.toRadians(player.getYaw());
+			double offsetX = Math.sin(yawRad) * 0.3f;
+			double offsetZ = -Math.cos(yawRad) * 0.3f;
+
+			Vec3d offsetLandingPos = landingPos.add(offsetX, 0, offsetZ);
+
+			Vec3d from = offsetLandingPos.subtract(0, 0.1, 0);
+			Vec3d to = new Vec3d(offsetLandingPos.x, -100, offsetLandingPos.z);
+
+			BlockHitResult downwardCheck = MC.world.raycast(new net.minecraft.world.RaycastContext(
+					from, to, net.minecraft.world.RaycastContext.ShapeType.COLLIDER, FluidHandling.NONE, player
+			));
+
+			if(downwardCheck.getType() == HitResult.Type.MISS)
+				type = HitResult.Type.MISS;
+		}
+
 		return new Trajectory(path, type);
 	}
 	
