@@ -42,7 +42,7 @@ public final class AutoClickerRightHack extends Hack implements UpdateListener
 	public AutoClickerRightHack()
 	{
 		super("AutoClickerRight");
-		setCategory(Category.ITEMS);
+		setCategory(Category.COMBAT);
 		addSetting(showMessage);
 		addSetting(dontInteractWithEntities);
 		addSetting(dontInteractWithBlocks);

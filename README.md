@@ -22,6 +22,7 @@ The client version is designed for playing Skywars/Bedwars. But of course, you c
 - AutoFriends (for you minigames teammates)
 - AutoYLeave
 - AutoToolDrop
+- TimeChanger
 - RadarHack only players mode
 - AutoArmor drop worst armor
 - AutoDrop disable after drop

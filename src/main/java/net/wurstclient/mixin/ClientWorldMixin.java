@@ -22,30 +22,33 @@ import net.minecraft.item.Items;
 import net.minecraft.world.GameMode;
 import net.wurstclient.WurstClient;
 
-@Mixin(ClientWorld.class)
+@Mixin(ClientWorld.Properties.class)
 public class ClientWorldMixin
 {
-	@Shadow
-	@Final
-	private MinecraftClient client;
-	
-	/**
-	 * This is the part that makes BarrierESP work.
-	 */
-	@Inject(at = @At("HEAD"),
-		method = "getBlockParticle()Lnet/minecraft/block/Block;",
-		cancellable = true)
-	private void onGetBlockParticle(CallbackInfoReturnable<Block> cir)
-	{
-		if(!WurstClient.INSTANCE.getHax().barrierEspHack.isEnabled())
+	@Inject(at = @At("TAIL"), method = "getTimeOfDay", cancellable = true)
+	private void getTimeOfDay(CallbackInfoReturnable<Long> ci) {
+		if (WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeTime.isChecked()) {
+			ci.setReturnValue((long) WurstClient.INSTANCE.getHax().timeChangerHack.time.getValueI());
 			return;
-			
-		// Pause BarrierESP when holding a light in Creative Mode, since it
-		// would otherwise prevent the player from seeing light blocks.
-		if(client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE
-			&& client.player.getMainHandStack().getItem() == Items.LIGHT)
+		}
+	}
+
+	@Inject(at = @At("TAIL"), method = "isRaining", cancellable = true)
+	private void isRaining(CallbackInfoReturnable<Boolean> ci) {
+		if (WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeWeather.isChecked()) {
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableRain.isChecked());
 			return;
-		
-		cir.setReturnValue(Blocks.BARRIER);
+		}
+	}
+
+	@Inject(at = @At("TAIL"), method = "isThundering", cancellable = true)
+	private void isThundering(CallbackInfoReturnable<Boolean> ci) {
+		if (WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.enableRain.isChecked()) {
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableThunder.isChecked());
+			return;
+		}
 	}
 }

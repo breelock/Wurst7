@@ -7,6 +7,9 @@
  */
 package net.wurstclient.mixin;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,40 +18,64 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.wurstclient.WurstClient;
-import net.wurstclient.hacks.NoWeatherHack;
+import net.wurstclient.hacks.TimeChangerHack;
 
 @Mixin(World.class)
-public abstract class WorldMixin implements WorldAccess, AutoCloseable
+@Environment(EnvType.CLIENT)
+public abstract class WorldMixin implements WorldAccess
 {
-	@Inject(at = @At("HEAD"),
-		method = "getRainGradient(F)F",
-		cancellable = true)
-	private void onGetRainGradient(float delta,
-		CallbackInfoReturnable<Float> cir)
-	{
-		if(WurstClient.INSTANCE.getHax().noWeatherHack.isRainDisabled())
-			cir.setReturnValue(0F);
-	}
-	
 	@Override
-	public float getSkyAngle(float tickDelta)
-	{
-		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
-		
-		long timeOfDay = noWeather.isTimeChanged() ? noWeather.getChangedTime()
-			: getLevelProperties().getTimeOfDay();
-		
-		return getDimension().getSkyAngle(timeOfDay);
+	public int getMoonPhase() {
+		if(WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeMoonPhase.isChecked() && this.getServer() == null)
+			return WurstClient.INSTANCE.getHax().timeChangerHack.moonPhase.getValueI();
+		return this.getDimension().getMoonPhase(this.getLunarTime());
 	}
-	
+
 	@Override
-	public int getMoonPhase()
-	{
-		NoWeatherHack noWeather = WurstClient.INSTANCE.getHax().noWeatherHack;
-		
-		if(noWeather.isMoonPhaseChanged())
-			return noWeather.getChangedMoonPhase();
-		
-		return getDimension().getMoonPhase(getLunarTime());
+	public float getMoonSize() {
+		return DimensionType.MOON_SIZES[this.getMoonPhase()];
+	}
+
+	@Inject(at = @At("TAIL"), method = "getRainGradient", cancellable = true)
+	private void getRainGradient(float delta, CallbackInfoReturnable<Float> ci) {
+		if(this.getServer() != null) return;
+		if(WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeWeather.isChecked())
+		{
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableRain.isChecked() ? 1f : 0f);
+			return;
+		}
+	}
+
+	@Inject(at = @At("TAIL"), method = "getThunderGradient", cancellable = true)
+	private void getThunderGradient(float delta, CallbackInfoReturnable<Float> ci) {
+		if(this.getServer() != null) return;
+		if(WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeWeather.isChecked())
+		{
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableThunder.isChecked() ? 1f : 0f);
+			return;
+		}
+	}
+
+	@Inject(at = @At("TAIL"), method = "isRaining", cancellable = true)
+	private void isRaining(CallbackInfoReturnable<Boolean> ci) {
+		if(this.getServer() != null) return;
+		if (WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeWeather.isChecked()) {
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableRain.isChecked());
+			return;
+		}
+	}
+
+	@Inject(at = @At("TAIL"), method = "isThundering", cancellable = true)
+	private void isThundering(CallbackInfoReturnable<Boolean> ci) {
+		if(this.getServer() != null) return;
+		if (WurstClient.INSTANCE.getHax().timeChangerHack.isEnabled() &&
+				WurstClient.INSTANCE.getHax().timeChangerHack.changeWeather.isChecked()) {
+			ci.setReturnValue(WurstClient.INSTANCE.getHax().timeChangerHack.enableThunder.isChecked());
+			return;
+		}
 	}
 }

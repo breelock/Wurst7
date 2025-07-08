@@ -56,7 +56,7 @@ public final class AutoClickerLeftHack extends Hack implements UpdateListener
 	public AutoClickerLeftHack()
 	{
 		super("AutoClickerLeft");
-		setCategory(Category.ITEMS);
+		setCategory(Category.COMBAT);
 		addSetting(mode);
 		addSetting(interrupt);
 		addSetting(showMessage);

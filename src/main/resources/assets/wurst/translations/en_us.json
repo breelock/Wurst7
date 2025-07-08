@@ -1,4 +1,5 @@
 {
+  "description.wurst.hack.timechanger": "Allows you to alter the client-side weather, time and moon phase.",
   "description.wurst.hack.autoclickerright": "Customizable right mouse button auto clicker. See also AutoClickerLeft.",
   "description.wurst.hack.autoclickerleft": "Customizable left mouse button auto clicker. See also AutoClickerRight.",
   "description.wurst.hack.aspectratio": "Allows you to stretch the screen without distorting the quality.",

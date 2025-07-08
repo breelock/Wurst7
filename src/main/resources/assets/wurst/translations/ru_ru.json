@@ -1,4 +1,5 @@
 {
+  "description.wurst.hack.timechanger": "Позволяет устанавливать погоду, время дня и фазу луны. §rТолько на Вашей стороне, на сервере ничего не изменится.",
   "description.wurst.hack.autoclickerright": "Настраиваемый автокликер правой кнопкой мыши. Смотрите также AutoClickerLeft.",
   "description.wurst.hack.autoclickerleft": "Настраиваемый автокликер левой кнопкой мыши. Смотрите также AutoClickerRight.",
   "description.wurst.hack.aspectratio": "Позволяет растягивать экран без ухудшения качества.",

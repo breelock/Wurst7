@@ -24,6 +24,7 @@
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
+    "ClientWorld2Mixin",
     "ControlsListWidgetMixin",
     "CreativeInventoryScreenMixin",
     "CustomPayloadC2SPacketAccessor",
