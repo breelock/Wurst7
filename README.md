@@ -2,7 +2,8 @@
 
 ![Wurst Client logo](/src/main/resources/assets/wurst/wurst_128.png)
 
-The client version is designed for playing Skywars/Bedwars. But of course, you can use this client for more than just that.. 
+The client version is designed for playing Skywars/Bedwars. But of course, you can use this client for more than just that.
+The Wurst was tested on the server “mc.dexland.org” in Skywars mode. 1150 games were played, and during that time, I never received a ban.
 
 - **Download:** [https://github.com/breelock/Wurst7/releases](https://github.com/breelock/Wurst7/releases)
 
