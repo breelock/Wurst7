@@ -41,8 +41,17 @@ public final class AutoClickerLeftHack extends Hack implements UpdateListener
 	public final CheckboxSetting autoJump = new CheckboxSetting(
 			"Auto jump", "Hack will jump when targeting an entity.", false);
 
-	public final CheckboxSetting onlyEntity = new CheckboxSetting(
-			"Only entity", "Hack will only attack the entity.", false);
+	public final CheckboxSetting dontAttackFrens = new CheckboxSetting(
+			"Don't attack frens", "Don't attack frens.", false);
+
+	public final CheckboxSetting dontAttackEntities = new CheckboxSetting(
+			"Don't attack entities", "Don't attack entities.", false);
+
+	public final CheckboxSetting dontAttackBlocks = new CheckboxSetting(
+			"Don't attack blocks", "Don't attack blocks.", false);
+
+	public final CheckboxSetting dontAttackAir = new CheckboxSetting(
+			"Don't attack air (Don't miss)", "Don't attack air (Don't miss).", false);
 
 	public AutoClickerLeftHack()
 	{
@@ -52,7 +61,10 @@ public final class AutoClickerLeftHack extends Hack implements UpdateListener
 		addSetting(interrupt);
 		addSetting(showMessage);
 		addSetting(autoJump);
-		addSetting(onlyEntity);
+		addSetting(dontAttackFrens);
+		addSetting(dontAttackEntities);
+		addSetting(dontAttackBlocks);
+		addSetting(dontAttackAir);
 		addSetting(minDelay);
 		addSetting(maxDelay);
 	}

@@ -30,11 +30,23 @@ public final class AutoClickerRightHack extends Hack implements UpdateListener
 	private final CheckboxSetting showMessage = new CheckboxSetting(
 			"Show message", "Show enable/disable message.", true);
 
+	public final CheckboxSetting dontInteractWithEntities = new CheckboxSetting(
+			"Don't interact with entities", "Don't interact with entities.", false);
+
+	public final CheckboxSetting dontInteractWithBlocks = new CheckboxSetting(
+			"Don't interact with blocks", "Don't interact with blocks.", false);
+
+	public final CheckboxSetting dontInteractWithItems = new CheckboxSetting(
+			"Don't interact with items", "Don't interact with items.", false);
+
 	public AutoClickerRightHack()
 	{
 		super("AutoClickerRight");
 		setCategory(Category.ITEMS);
 		addSetting(showMessage);
+		addSetting(dontInteractWithEntities);
+		addSetting(dontInteractWithBlocks);
+		addSetting(dontInteractWithItems);
 		addSetting(minDelay);
 		addSetting(maxDelay);
 	}

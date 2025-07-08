@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoClickerLeftHack;
+import net.wurstclient.hacks.AutoClickerRightHack;
 
 public class PlayerMethods {
     public static void attack(MinecraftClient client, boolean isNewPvP) {
@@ -35,66 +36,58 @@ public class PlayerMethods {
             AutoClickerLeftHack hack = WurstClient.INSTANCE.getHax().autoClickerLeftHack;
 
             if (isNewPvP) {
-                if (hack.onlyEntity.isChecked()) {
-                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY) {
-                        if (!targetIsProtectedByShield(client, ((EntityHitResult) client.crosshairTarget).getEntity())) {
-                            if (attackCooldown >= cooldownTime - jumpCooldown && hack.autoJump.isChecked() && client.player.isOnGround() && !client.player.isTouchingWater() && !isInLava)
-                                client.player.jump();
-
-                            if (attackCooldown >= cooldownTime) {
-                                if (!isOnGround && client.player.getVelocity().y < -0.1 || client.player.isOnGround() || client.player.getAbilities().flying || client.player.isTouchingWater() || isInLava) {
-                                    if (interrupt(client, true)) return;
-                                    PlayerMethods.attackEntity(client);
-                                }
-                            }
-                        }
-                    }
+                if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && !hack.dontAttackEntities.isChecked() && attackCooldown >= cooldownTime - jumpCooldown && hack.autoJump.isChecked() && client.player.isOnGround() && !client.player.isTouchingWater() && !isInLava) {
+                    if (!targetIsProtectedByShield(client, ((EntityHitResult) client.crosshairTarget).getEntity()))
+                        client.player.jump();
                 }
-                else {
-                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && attackCooldown >= cooldownTime - jumpCooldown && hack.autoJump.isChecked() && client.player.isOnGround() && !client.player.isTouchingWater() && !isInLava) {
-                        if (!targetIsProtectedByShield(client, ((EntityHitResult) client.crosshairTarget).getEntity()))
-                            client.player.jump();
-                    }
 
-                    if (attackCooldown >= cooldownTime) {
-                        if (interrupt(client, true)) return;
+                if (attackCooldown >= cooldownTime) {
+                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && !hack.dontAttackEntities.isChecked()) {
+                        Entity entity = ((EntityHitResult) client.crosshairTarget).getEntity();
+                        if (hack.dontAttackFrens.isChecked() && entity.isPlayer() && WurstClient.INSTANCE.getFriends().contains(entity.getEntityName()))
+                            return;
 
-                        if (client.crosshairTarget.getType() == HitResult.Type.ENTITY) {
-                            if (!targetIsProtectedByShield(client, ((EntityHitResult) client.crosshairTarget).getEntity())) {
-                                if (!isOnGround && client.player.getVelocity().y < -0.1 || client.player.isOnGround() || client.player.getAbilities().flying || client.player.isTouchingWater() || isInLava)
-                                    PlayerMethods.attackEntity(client);
+                        if (!targetIsProtectedByShield(client, entity)) {
+                            if (!isOnGround && client.player.getVelocity().y < -0.1 || client.player.isOnGround() || client.player.getAbilities().flying || client.player.isTouchingWater() || isInLava) {
+                                if (interrupt(client, true)) return;
+                                PlayerMethods.attackEntity(client);
                             }
                         }
-                        else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK)
-                            PlayerMethods.breakBlock(client);
-                        else if (client.crosshairTarget.getType() == HitResult.Type.MISS) {
-                            client.player.swingHand(Hand.MAIN_HAND);
-                            resetAttackCooldown(client);
-                        }
+                    }
+                    else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK && !hack.dontAttackBlocks.isChecked()) {
+                        if (interrupt(client, true)) return;
+                        PlayerMethods.breakBlock(client);
+                    }
+
+                    else if (client.crosshairTarget.getType() == HitResult.Type.MISS && !hack.dontAttackAir.isChecked()) {
+                        if (interrupt(client, true)) return;
+                        client.player.swingHand(Hand.MAIN_HAND);
+                        resetAttackCooldown(client);
                     }
                 }
             }
             else {
-                if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && hack.autoJump.isChecked() && client.player.isOnGround() && !client.player.isTouchingWater() && !isInLava)
-                    client.player.jump();
+                if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && !hack.dontAttackEntities.isChecked()) {
+                    Entity entity = ((EntityHitResult) client.crosshairTarget).getEntity();
+                    if (hack.dontAttackFrens.isChecked() && entity.isPlayer() && WurstClient.INSTANCE.getFriends().contains(entity.getEntityName()))
+                        return;
 
-                if (hack.onlyEntity.isChecked()) {
-                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY) {
-                        if (interrupt(client, false)) return;
-                        PlayerMethods.attackEntity(client);
-                    }
-                }
-                else {
+                    if (hack.autoJump.isChecked() && client.player.isOnGround() && !client.player.isTouchingWater() && !isInLava)
+                        client.player.jump();
+
                     if (interrupt(client, false)) return;
+                    PlayerMethods.attackEntity(client);
+                }
 
-                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY)
-                        PlayerMethods.attackEntity(client);
-                    else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK)
-                        PlayerMethods.breakBlock(client);
-                    else if (client.crosshairTarget.getType() == HitResult.Type.MISS) {
-                        client.player.swingHand(Hand.MAIN_HAND);
-                        resetAttackCooldown(client);
-                    }
+                else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK && !hack.dontAttackBlocks.isChecked()) {
+                    if (interrupt(client, false)) return;
+                    PlayerMethods.breakBlock(client);
+                }
+
+                else if (client.crosshairTarget.getType() == HitResult.Type.MISS && !hack.dontAttackAir.isChecked()) {
+                    if (interrupt(client, false)) return;
+                    client.player.swingHand(Hand.MAIN_HAND);
+                    resetAttackCooldown(client);
                 }
             }
         }
@@ -102,17 +95,19 @@ public class PlayerMethods {
 
     public static void interact(MinecraftClient client) {
         if (client.player != null && !client.player.isSpectator() && client.interactionManager != null && !client.interactionManager.isBreakingBlock() && !client.player.isRiding()) {
+            AutoClickerRightHack hack = WurstClient.INSTANCE.getHax().autoClickerRightHack;
             for (Hand hand : Hand.values()) {
                 if (client.crosshairTarget != null) {
-                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY) {
+                    if (client.crosshairTarget.getType() == HitResult.Type.ENTITY && !hack.dontInteractWithEntities.isChecked()) {
                         if (PlayerMethods.interactEntity(client, hand)) return;
                     }
-                    else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                    else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK && !hack.dontInteractWithBlocks.isChecked()) {
                         if (PlayerMethods.interactBlock(client, hand)) return;
                     }
 
                 }
-                interactItem(client, hand);
+                if (!hack.dontInteractWithItems.isChecked())
+                    interactItem(client, hand);
             }
         }
     }
