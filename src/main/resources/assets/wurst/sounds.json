@@ -1,0 +1,14 @@
+{
+  "hitsounds/moan_1": {
+    "sounds": ["wurst:hitsounds/moan_1"]
+  },
+  "hitsounds/moan_2": {
+    "sounds": ["wurst:hitsounds/moan_2"]
+  },
+  "hitsounds/moan_3": {
+    "sounds": ["wurst:hitsounds/moan_3"]
+  },
+  "hitsounds/moan_4": {
+    "sounds": ["wurst:hitsounds/moan_4"]
+  }
+}

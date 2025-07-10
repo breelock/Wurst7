@@ -1,4 +1,5 @@
 {
+  "description.wurst.hack.hitsounds": "Plays sound on hit.\n\n§lTip:§r If the sound is not playing, try adding volume in the audio settings under the players category.",
   "description.wurst.hack.timechanger": "Allows you to alter the client-side weather, time and moon phase.",
   "description.wurst.hack.autoclickerright": "Customizable right mouse button auto clicker. See also AutoClickerLeft.",
   "description.wurst.hack.autoclickerleft": "Customizable left mouse button auto clicker. See also AutoClickerRight.",

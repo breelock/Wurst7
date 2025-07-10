@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,6 +22,10 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.wurstclient.altmanager.AltManager;
 import net.wurstclient.altmanager.Encryption;
 import net.wurstclient.analytics.PlausibleAnalytics;
@@ -73,6 +78,8 @@ public enum WurstClient
 	private RotationFaker rotationFaker;
 	private FriendsList friends;
 	private WurstTranslator translator;
+
+	public final List<SoundEvent> hitSounds = new ArrayList<>();
 	
 	private boolean enabled = true;
 	private static boolean guiInitialized;
@@ -145,12 +152,8 @@ public enum WurstClient
 		Path altsFile = wurstFolder.resolve("alts.encrypted_json");
 		Path encFolder = Encryption.chooseEncryptionFolder();
 		altManager = new AltManager(altsFile, encFolder);
-		
-		if(FabricLoader.getInstance().isModLoaded("connectormod"))
-		{
-			System.out.println("[Wurst] Applying fixes for Sinytra Connector");
-			HudRenderCallback.EVENT.register(this::onHudRender);
-		}
+
+		registerSounds();
 
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (client.currentScreen == null && isDotPressed()) {
@@ -163,7 +166,22 @@ public enum WurstClient
 			}
 		});
 
+		if(FabricLoader.getInstance().isModLoaded("connectormod"))
+		{
+			System.out.println("[Wurst] Applying fixes for Sinytra Connector");
+			HudRenderCallback.EVENT.register(this::onHudRender);
+		}
+
 		new DiscordRPC(DsRpcClientID).run();
+	}
+
+	private void registerSounds() {
+		for (int i = 1; i <= 4; i++) {
+			Identifier id = new Identifier("wurst", "hitsounds/moan_" + i);
+			SoundEvent sound = SoundEvent.of(id);
+			Registry.register(Registries.SOUND_EVENT, id, sound);
+			hitSounds.add(sound);
+		}
 	}
 
 	public SettingsFile getSettingsFile() {

@@ -51,6 +51,7 @@ public final class HackList implements UpdateListener
 	public final AutoClickerRightHack autoClickerRightHack = new AutoClickerRightHack();
 	public final ClickPearlHack clickPearlHack = new ClickPearlHack();
 	public final AutoFriendsHack autoFriendsHack = new AutoFriendsHack();
+	public final HitSoundsHack hitSoundsHack = new HitSoundsHack();
 	public final AutoLeaveHack autoLeaveHack = new AutoLeaveHack();
 	public final AutoYLeaveHack autoYLeaveHack = new AutoYLeaveHack();
 	public final AutoLibrarianHack autoLibrarianHack = new AutoLibrarianHack();

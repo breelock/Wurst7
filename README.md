@@ -24,6 +24,7 @@ The Wurst was tested on the server “mc.dexland.org” in Skywars mode. 1150 ga
 - AutoYLeave
 - AutoToolDrop
 - TimeChanger
+- HitSounds
 - RadarHack only players mode
 - AutoArmor drop worst armor
 - AutoDrop disable after drop

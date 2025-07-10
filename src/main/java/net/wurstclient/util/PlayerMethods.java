@@ -154,12 +154,12 @@ public class PlayerMethods {
         return false;
     }
 
-    private static int getAttackCooldownInTicks(PlayerEntity player) {
+    public static int getAttackCooldownInTicks(PlayerEntity player) {
         float cooldown = player.getAttackCooldownProgress(0.0f);
         return MathHelper.ceil(cooldown * getAttackSpeedInTicks(player));
     }
 
-    private static float getAttackSpeedInTicks(PlayerEntity player) {
+    public static float getAttackSpeedInTicks(PlayerEntity player) {
         float attackSpeed = (float) player.getAttributeValue(EntityAttributes.GENERIC_ATTACK_SPEED);
         return (1.0f / attackSpeed) * 20.0f;
     }
