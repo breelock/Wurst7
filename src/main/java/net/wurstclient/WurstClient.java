@@ -163,14 +163,7 @@ public enum WurstClient
 			}
 		});
 
-		if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled())
-		{
-            try {
-                new DiscordRPC(DsRpcClientID).run();
-            } catch (Exception e) {
-				System.err.println(e);
-            }
-        }
+		new DiscordRPC(DsRpcClientID).run();
 	}
 
 	public SettingsFile getSettingsFile() {

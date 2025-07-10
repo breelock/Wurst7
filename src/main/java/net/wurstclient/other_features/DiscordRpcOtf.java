@@ -11,23 +11,48 @@ import net.wurstclient.DontBlock;
 import net.wurstclient.SearchTags;
 import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.TextFieldSetting;
 
 @DontBlock
-@SearchTags({"RPC", "Discord", "Ds", "dsrpc", "dc"})
+@SearchTags({"RPC", "Discord", "Ds", "dsrpc", "dc", "dcrpc"})
 public final class DiscordRpcOtf extends OtherFeature
 {
 	private final CheckboxSetting enableDiscordRpc =
 		new CheckboxSetting("Enable DiscordRPC", true);
 
+	private final TextFieldSetting detailsRPC = new TextFieldSetting("Details",
+			"Text displayed in DiscordRPC as details", "by breelock");
+
 	public DiscordRpcOtf()
 	{
 		super("DiscordRPC", "Enable DiscordRpc");
 		addSetting(enableDiscordRpc);
+		addSetting(detailsRPC);
 	}
 	
 	@Override
 	public boolean isEnabled()
 	{
 		return enableDiscordRpc.isChecked();
+	}
+
+	public String getDetailsRPC()
+	{
+		return detailsRPC.getValue();
+	}
+
+	@Override
+	public void doPrimaryAction()
+	{
+		enableDiscordRpc.setChecked(!enableDiscordRpc.isChecked());
+	}
+
+	@Override
+	public String getPrimaryAction()
+	{
+		if (enableDiscordRpc.isChecked())
+			return "Disable DiscordRPC";
+		else
+			return "Enable DiscordRPC";
 	}
 }

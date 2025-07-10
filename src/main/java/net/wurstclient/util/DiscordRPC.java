@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -16,6 +17,7 @@ public class DiscordRPC {
     private final String clientId;
     private Timer heartbeatTimer;
     private final long timestamp;
+    private String curDesc = null;
 
     public DiscordRPC(String clientId) {
         this.clientId = clientId;
@@ -23,8 +25,7 @@ public class DiscordRPC {
     }
 
     public void run() {
-        if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled())
-            new Thread(this::connectLoop, "Discord-RPC-Thread").start();
+        new Thread(this::connectLoop, "Discord-RPC-Thread").start();
     }
 
     private void connectLoop() {
@@ -32,13 +33,14 @@ public class DiscordRPC {
             try {
                 pipe = waitForDiscord();
 
+                curDesc = WurstClient.INSTANCE.getOtfs().discordRpcOtf.getDetailsRPC();
                 sendHandshake();
                 sendActivity();
                 startHeartbeat();
 
                 while (true) {
                     Thread.sleep(5000);
-                    if (!isPipeAlive() || !WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled()) throw new Exception("Pipe is closed");
+                    if (!isPipeAlive() || !WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled() || !Objects.equals(curDesc, WurstClient.INSTANCE.getOtfs().discordRpcOtf.getDetailsRPC())) throw new Exception("Pipe is closed");
                 }
 
             } catch (Exception e) {
@@ -68,7 +70,7 @@ public class DiscordRPC {
                 + "\"args\":{"
                 +     "\"pid\":" + pid + ","
                 +     "\"activity\":{"
-                +         "\"details\":\"by breelock\","
+                +         "\"details\":\"" + curDesc + "\","
                 +         "\"start_timestamp\":" + timestamp + ","
                 +         "\"large_image_key\":\"logo\""
                 +     "}"
