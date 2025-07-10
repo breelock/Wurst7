@@ -13,15 +13,15 @@ import net.wurstclient.other_feature.OtherFeature;
 import net.wurstclient.settings.CheckboxSetting;
 
 @DontBlock
-@SearchTags({"privacy", "data", "tracking", "snooper", "spyware"})
+@SearchTags({"RPC", "Discord", "Ds", "dsrpc", "dc"})
 public final class DiscordRpcOtf extends OtherFeature
 {
 	private final CheckboxSetting enableDiscordRpc =
-		new CheckboxSetting("Enable DiscordRPC (need restart)", true);
+		new CheckboxSetting("Enable DiscordRPC", true);
 
 	public DiscordRpcOtf()
 	{
-		super("DiscordRPC", "Enable DiscordRpc (need restart)");
+		super("DiscordRPC", "Enable DiscordRpc");
 		addSetting(enableDiscordRpc);
 	}
 	

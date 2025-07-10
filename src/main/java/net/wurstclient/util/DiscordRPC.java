@@ -1,5 +1,7 @@
 package net.wurstclient.util;
 
+import net.wurstclient.WurstClient;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,7 +23,8 @@ public class DiscordRPC {
     }
 
     public void run() {
-        new Thread(this::connectLoop, "Discord-RPC-Thread").start();
+        if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled())
+            new Thread(this::connectLoop, "Discord-RPC-Thread").start();
     }
 
     private void connectLoop() {
@@ -33,10 +36,9 @@ public class DiscordRPC {
                 sendActivity();
                 startHeartbeat();
 
-                // Ждём, пока pipe жив
                 while (true) {
                     Thread.sleep(5000);
-                    if (!isPipeAlive()) throw new IOException("Pipe is closed");
+                    if (!isPipeAlive() || !WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled()) throw new Exception("Pipe is closed");
                 }
 
             } catch (Exception e) {
@@ -46,7 +48,8 @@ public class DiscordRPC {
                 pipe = null;
 
                 try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
-                System.out.println("Reconnecting...");
+                if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled())
+                    System.out.println("Reconnecting...");
             }
         }
     }
@@ -132,9 +135,11 @@ public class DiscordRPC {
 
     private RandomAccessFile waitForDiscord() {
         while (true) {
-            RandomAccessFile pipe = findDiscordPipe();
-            if (pipe != null)
-                return pipe;
+            if (WurstClient.INSTANCE.getOtfs().discordRpcOtf.isEnabled()) {
+                RandomAccessFile pipe = findDiscordPipe();
+                if (pipe != null)
+                    return pipe;
+            }
             try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
         }
     }
