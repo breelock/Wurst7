@@ -24,7 +24,7 @@ import java.util.*;
 import static net.wurstclient.util.PlayerMethods.getAttackCooldownInTicks;
 import static net.wurstclient.util.PlayerMethods.getAttackSpeedInTicks;
 
-@SearchTags({"hit sound", "hitsound", "sound", "sfx", "hit", "crit"})
+@SearchTags({"hit sound", "hitsound", "sound", "sfx", "hit", "crit", "hot", "hotsound"})
 public final class HitSoundsHack extends Hack
 {
 	private final CheckboxSetting onlyInCrit = new CheckboxSetting("Only in crit",

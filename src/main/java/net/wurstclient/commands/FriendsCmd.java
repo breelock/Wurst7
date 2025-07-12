@@ -54,10 +54,14 @@ public class FriendsCmd extends Command
 			break;
 			
 			case "remove":
+			case "delete":
+			case "rm":
+			case "del":
 			remove(args);
 			break;
 			
 			case "clear":
+			case "clean":
 			removeAll(args);
 			break;
 			

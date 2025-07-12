@@ -76,11 +76,16 @@ public final class CfgCmd extends Command
 			cfgList(args);
 			break;
 
+			case "remove":
 			case "delete":
+			case "rm":
+			case "del":
 			deleteCfg(args);
 			break;
 
 			case "dir":
+			case "path":
+			case "folder":
 			openCfgDir();
 			break;
 			
