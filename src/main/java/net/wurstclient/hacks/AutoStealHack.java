@@ -7,16 +7,11 @@
  */
 package net.wurstclient.hacks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -53,7 +48,7 @@ public final class AutoStealHack extends Hack
 			new CheckboxSetting("Check chest title, if it is not default, don't steal", true);
 	
 	private Thread thread;
-	private List<ItemStack> shit = new ArrayList<>();
+	private final List<ItemStack> shit = new ArrayList<>();
 	
 	public AutoStealHack()
 	{
@@ -109,48 +104,11 @@ public final class AutoStealHack extends Hack
 		AutoDropHack dropH = WurstClient.INSTANCE.getHax().autoDropHack;
 		AutoSwordHack swordH = WurstClient.INSTANCE.getHax().autoSwordHack;
 		AutoArmorHack armorH = WurstClient.INSTANCE.getHax().autoArmorHack;
+		AutoToolHack toolDH = WurstClient.INSTANCE.getHax().autoToolHack;
 
-		float bestSwordValue = -1;
-
-		// find best sword
-		for (int slt = 0; slt < 36; slt++) {
-			ItemStack stack = MC.player.getInventory().getStack(slt);
-			if (stack.isEmpty() || !(stack.getItem() instanceof SwordItem sword)) continue;
-
-			float value = swordH.getSwordValue(stack, sword);
-			if (value > bestSwordValue) {
-				bestSwordValue = value;
-			}
-		}
-
-		int[] bestArmorValues = new int[4];
-
-		// initialize with currently equipped armor
-		for(int type = 0; type < 4; type++)
-		{
-			ItemStack stack = MC.player.getInventory().getArmorStack(type);
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
-				continue;
-
-			ArmorItem item = (ArmorItem)stack.getItem();
-			bestArmorValues[type] = armorH.getArmorValue(item, stack);
-		}
-
-		// search inventory for better armor
-		for(int slot = 0; slot < 36; slot++)
-		{
-			ItemStack stack = MC.player.getInventory().getStack(slot);
-
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
-				continue;
-
-			ArmorItem item = (ArmorItem)stack.getItem();
-			int armorType = item.getSlotType().getEntitySlotId();
-			int armorValue = armorH.getArmorValue(item, stack);
-
-			if(armorValue > bestArmorValues[armorType])
-				bestArmorValues[armorType] = armorValue;
-		}
+		float bestSwordValue = swordH.getBestSword().getValue();
+		int[] bestArmorValues = armorH.getBestArmor().getValue();
+		Map<AutoToolHack.MCTool, Float> bestToolsValues = toolDH.getBestTools().getValue();
 
         while (MC.currentScreen == screen) {
             for (Slot slot : slots)
@@ -168,14 +126,14 @@ public final class AutoStealHack extends Hack
                             continue;
                         }
 
-                        if (stack.getItem() instanceof SwordItem sword) {
+                        if (item instanceof SwordItem sword) {
                             if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
                                 shit.add(stack);
                                 continue;
                             }
                         }
 
-                        if (stack.getItem() instanceof ArmorItem armorItem) {
+                        if (item instanceof ArmorItem armorItem) {
                             int armorType = armorItem.getSlotType().getEntitySlotId();
                             int armorValue = armorH.getArmorValue(armorItem, stack);
 
@@ -184,6 +142,14 @@ public final class AutoStealHack extends Hack
                                 continue;
                             }
                         }
+
+						AutoToolHack.MCTool toolT = toolDH.getMCTool(item);
+						if (toolT != AutoToolHack.MCTool.Null) {
+							if (toolDH.getToolValue(toolT, stack, item) <= (bestToolsValues.get(toolT) == null ? -1 : bestToolsValues.get(toolT))) {
+								shit.add(stack);
+								continue;
+							}
+						}
                     }
 
                     Thread.sleep(delay.getValueI());
@@ -212,10 +178,8 @@ public final class AutoStealHack extends Hack
                 }
             }
 
-			if (fullEmpty && firstRun && isShitChest) {
-				// firstRun = false;
+			if (fullEmpty && firstRun && isShitChest)
 				continue;
-			}
 
             if (allEmpty) {
                 if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)

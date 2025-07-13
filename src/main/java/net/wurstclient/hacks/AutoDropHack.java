@@ -9,17 +9,24 @@ package net.wurstclient.hacks;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SwordItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.registry.Registries;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
+import net.wurstclient.WurstClient;
 import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.ItemListSetting;
+import net.wurstclient.settings.SliderSetting;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SearchTags({"auto drop", "AutoEject", "auto-eject", "auto eject",
 	"InventoryCleaner", "inventory cleaner", "InvCleaner", "inv cleaner"})
@@ -36,12 +43,16 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		"minecraft:wheat_seeds", "minecraft:white_tulip");
 
 	private final CheckboxSetting disableAfterDrop = new CheckboxSetting("Disable after drop", "Disable after drop", true);
-
-	private final String renderName =
-		Math.random() < 0.01 ? "AutoLinus" : getName();
+	private final CheckboxSetting dropSwords = new CheckboxSetting("Drop swords", "Throw away the worst swords", true);
+	private final CheckboxSetting dropArmor = new CheckboxSetting("Drop armor", "Throw away the worst armor", true);
+	private final CheckboxSetting dropTools = new CheckboxSetting("Drop tools", "Throw away the worst tools", true);
+	private final SliderSetting delay = new SliderSetting("Delay",
+			"Amount of ticks to wait before drop.", 2,
+			0, 20, 1, SliderSetting.ValueDisplay.INTEGER);
 
 	private boolean isDropped = false;
 	private boolean invIsOpen = false;
+	private int timer;
 	
 	public AutoDropHack()
 	{
@@ -49,12 +60,10 @@ public final class AutoDropHack extends Hack implements UpdateListener
 		setCategory(Category.ITEMS);
 		addSetting(items);
 		addSetting(disableAfterDrop);
-	}
-	
-	@Override
-	public String getRenderName()
-	{
-		return renderName;
+		addSetting(delay);
+		addSetting(dropSwords);
+		addSetting(dropArmor);
+		addSetting(dropTools);
 	}
 	
 	@Override
@@ -91,7 +100,12 @@ public final class AutoDropHack extends Hack implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		// check screen
+		if(timer > 0)
+		{
+			timer--;
+			return;
+		}
+
 		if(MC.currentScreen instanceof HandledScreen
 			&& !(MC.currentScreen instanceof InventoryScreen))
 			return;
@@ -100,31 +114,68 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			|| MC.player.input.movementSideways != 0)
 			return;
 
+		AutoSwordHack swordH = WurstClient.INSTANCE.getHax().autoSwordHack;
+		AutoArmorHack armorH = WurstClient.INSTANCE.getHax().autoArmorHack;
+		AutoToolHack toolDH = WurstClient.INSTANCE.getHax().autoToolHack;
+
+		int bestSwordSlot = swordH.getBestSword().getKey();
+		int[] bestArmorSlots = armorH.getBestArmor().getKey();
+		Map<AutoToolHack.MCTool, Integer> bestToolsSlots = toolDH.getBestTools().getKey();
+
 		for(int slot = 9; slot < 45; slot++)
 		{
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
+
 			ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
-			
 			if(stack.isEmpty())
 				continue;
 			
 			Item item = stack.getItem();
 			String itemName = Registries.ITEM.getId(item).toString();
-			
-			if(!items.getItemNames().contains(itemName))
-				continue;
 
-			openServInv(true);
-			IMC.getInteractionManager().windowClick_THROW(slot);
-			openServInv(false);
+			if (dropSwords.isChecked() && item instanceof SwordItem) {
+				if (adjustedSlot != bestSwordSlot) {
+					drop(slot);
+					return;
+				}
+			}
+
+			if (dropArmor.isChecked() && item instanceof ArmorItem armorItem) {
+				int armorType = armorItem.getSlotType().getEntitySlotId();
+				if (adjustedSlot != bestArmorSlots[armorType]) {
+					drop(slot);
+					return;
+				}
+			}
+
+			AutoToolHack.MCTool toolT = toolDH.getMCTool(item);
+			if (dropTools.isChecked() && toolT != AutoToolHack.MCTool.Null) {
+				if (adjustedSlot != (bestToolsSlots.get(toolT) == null ? -1 : bestToolsSlots.get(toolT))) {
+					drop(slot);
+					return;
+				}
+			}
+
+			if(items.getItemNames().contains(itemName)) {
+				drop(slot);
+				return;
+			}
 		}
 
 		if (disableAfterDrop.isChecked()) {
 			isDropped = true;
 			this.setEnabled(false);
 		}
+	}
+
+	private void drop(int slot)
+	{
+		openServInv(true);
+		IMC.getInteractionManager().windowClick_THROW(slot);
+		openServInv(false);
+		timer = delay.getValueI();
 	}
 
 	private void openServInv(boolean open)

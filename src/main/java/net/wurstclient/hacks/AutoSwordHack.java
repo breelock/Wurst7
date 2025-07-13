@@ -35,6 +35,8 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.util.ItemUtils;
 
+import java.util.AbstractMap;
+
 @SearchTags({"auto sword"})
 public final class AutoSwordHack extends Hack implements UpdateListener, PacketOutputListener
 {
@@ -56,8 +58,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			"Slot in the hot bar where the sword will be placed.",
 			1, 1, 9, 1, ValueDisplay.INTEGER);
 
-	private final CheckboxSetting dropSwords = new CheckboxSetting("Drop swords", "Throw away the worst swords", true);
-
 	private int timer;
 	private boolean invIsOpen = false;
 	
@@ -68,7 +68,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		addSetting(swapWhileMoving);
 		addSetting(delay);
 		addSetting(swordSlot);
-		addSetting(dropSwords);
 	}
 	
 	@Override
@@ -102,95 +101,42 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		if (!swapWhileMoving.isChecked() && (player.input.movementForward != 0 || player.input.movementSideways != 0))
 			return;
 
-		do {
-			float bestSwordValue = -1;
-			int bestSwordSlot = -1;
+		AbstractMap.SimpleEntry<Integer, Float> swrd = getBestSword();
+		float bestSwordValue = swrd.getValue();
+		int bestSwordSlot = swrd.getKey();
 
-			for (int slot = 0; slot < 36; slot++) {
-				ItemStack stack = inventory.getStack(slot);
-				if (stack.isEmpty() || !(stack.getItem() instanceof SwordItem sword)) continue;
+		ItemStack currentStack = inventory.getStack(swordSlot.getValueI() - 1);
+		float currentSwordValue = -1;
 
-				float value = getSwordValue(stack, sword);
-				if (value > bestSwordValue) {
-					bestSwordValue = value;
-					bestSwordSlot = slot;
-				}
-			}
+		if (!currentStack.isEmpty() && currentStack.getItem() instanceof SwordItem currentSword)
+			currentSwordValue = getSwordValue(currentStack, currentSword);
 
-			ItemStack currentStack = inventory.getStack(swordSlot.getValueI() - 1);
-			float currentSwordValue = -1;
-
-			if (!currentStack.isEmpty() && currentStack.getItem() instanceof SwordItem currentSword)
-				currentSwordValue = getSwordValue(currentStack, currentSword);
-
-			if (bestSwordSlot == -1
-					|| bestSwordSlot == swordSlot.getValueI() - 1
-					|| currentSwordValue >= bestSwordValue
-					|| inventory.getEmptySlot() == -1) {
-				break;
-			}
-
-			if (!currentStack.isEmpty()) {
-				IMC.getInteractionManager().windowClick_QUICK_MOVE(swordSlot.getValueI() + 35);
-			}
-
-			int slotId = bestSwordSlot < 9 ? bestSwordSlot + 36 : bestSwordSlot;
-			Int2ObjectMap<ItemStack> stackMap = new Int2ObjectOpenHashMap<>();
-			int revision = player.currentScreenHandler.getRevision();
-			openServInv(true);
-			player.networkHandler.sendPacket(new ClickSlotC2SPacket(
-					0, revision, slotId, 0, SlotActionType.PICKUP,
-					player.currentScreenHandler.getSlot(slotId).getStack(), stackMap));
-
-			player.networkHandler.sendPacket(new ClickSlotC2SPacket(
-					0, revision, swordSlot.getValueI() + 35, 0, SlotActionType.PICKUP,
-					player.currentScreenHandler.getSlot(swordSlot.getValueI() + 35).getStack(), stackMap));
-			openServInv(false);
-		} while (false);
-
-		// Throw away the worst swords
-		if (dropSwords.isChecked())
-		{
-			for (int slot = 9; slot < 45; slot++) {
-				int adjusted = slot >= 36 ? slot - 36 : slot;
-				if (adjusted == swordSlot.getValueI() - 1) continue;
-				ItemStack stack = inventory.getStack(adjusted);
-
-				if (!stack.isEmpty() && isWorseOrSameSword(stack)) {
-					openServInv(true);
-					IMC.getInteractionManager().windowClick_THROW(slot);
-					openServInv(false);
-				}
-			}
+		if (bestSwordSlot == -1
+				|| bestSwordSlot == swordSlot.getValueI() - 1
+				|| currentSwordValue >= bestSwordValue
+				|| inventory.getEmptySlot() == -1) {
+			return;
 		}
+
+		if (!currentStack.isEmpty()) {
+			IMC.getInteractionManager().windowClick_QUICK_MOVE(swordSlot.getValueI() + 35);
+		}
+
+		int slotId = bestSwordSlot < 9 ? bestSwordSlot + 36 : bestSwordSlot;
+		Int2ObjectMap<ItemStack> stackMap = new Int2ObjectOpenHashMap<>();
+		int revision = player.currentScreenHandler.getRevision();
+		openServInv(true);
+		player.networkHandler.sendPacket(new ClickSlotC2SPacket(
+				0, revision, slotId, 0, SlotActionType.PICKUP,
+				player.currentScreenHandler.getSlot(slotId).getStack(), stackMap));
+
+		player.networkHandler.sendPacket(new ClickSlotC2SPacket(
+				0, revision, swordSlot.getValueI() + 35, 0, SlotActionType.PICKUP,
+				player.currentScreenHandler.getSlot(swordSlot.getValueI() + 35).getStack(), stackMap));
+		openServInv(false);
 	}
 
-	public boolean isWorseOrSameSword(ItemStack candidate)
-	{
-		// If candidate is not sword
-		if(!(candidate.getItem() instanceof SwordItem candidateItem))
-			return false;
-
-		var player = MinecraftClient.getInstance().player;
-		if(player == null)
-			return false;
-
-		ItemStack equipped = player.getInventory().getStack(swordSlot.getValueI() - 1);
-
-		// If nothing is equipped
-		if(equipped.isEmpty())
-			return false;
-
-		// If equipped not an armor
-		if(!(equipped.getItem() instanceof SwordItem equippedItem))
-			return false;
-
-		float candidateValue = getSwordValue(candidate, candidateItem);
-		float equippedValue = getSwordValue(equipped, equippedItem);
-		return candidateValue <= equippedValue;
-	}
-
-	public static float getSwordValue(ItemStack stack, SwordItem item) {
+	public float getSwordValue(ItemStack stack, SwordItem item) {
 		float dmg = item.getAttackDamage();
 		int enchantmentBonus = 0;
 
@@ -202,6 +148,40 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
 
 		return dmg * 5 + enchantmentBonus;
+	}
+
+	public AbstractMap.SimpleEntry<Integer, Float> getBestSword() {
+		float bestSwordValue = -1;
+		int bestSwordSlot = -1;
+
+		for (int slot = 0; slot < 36; slot++) {
+			ItemStack stack = MC.player.getInventory().getStack(slot);
+			if (stack.isEmpty() || !(stack.getItem() instanceof SwordItem sword)) continue;
+
+			float value = getSwordValue(stack, sword);
+			if (value > bestSwordValue) {
+				bestSwordValue = value;
+				bestSwordSlot = slot;
+			}
+		}
+
+		return new AbstractMap.SimpleEntry<>(bestSwordSlot, bestSwordValue);
+	}
+
+	private void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
+		}
 	}
 
 	@Override
@@ -293,22 +273,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		public String toString()
 		{
 			return name;
-		}
-	}
-
-	private void openServInv(boolean open)
-	{
-		if (MC.player == null)
-			return;
-
-		if (open && !invIsOpen) {
-			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
-			invIsOpen = true;
-		}
-
-		else if (!open && invIsOpen) {
-			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-			invIsOpen = false;
 		}
 	}
 }

@@ -7,6 +7,9 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
@@ -15,8 +18,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.Category;
@@ -287,4 +289,68 @@ public final class AutoToolHack extends Hack
 		
 		return -1;
 	}
+
+	public float getToolValue(MCTool mcTool, ItemStack stack, Item item) {
+		float speed;
+		if (mcTool == MCTool.Shovel && item instanceof ShovelItem shovel)
+			speed = shovel.getMaterial().getMiningSpeedMultiplier();
+		else if (mcTool == MCTool.Pickaxe && item instanceof PickaxeItem pickaxe)
+			speed = pickaxe.getMaterial().getMiningSpeedMultiplier();
+		else if (mcTool == MCTool.Axe && item instanceof AxeItem axe)
+			speed = axe.getMaterial().getMiningSpeedMultiplier();
+		else if (mcTool == MCTool.Hoe && item instanceof HoeItem hoe)
+			speed = hoe.getMaterial().getMiningSpeedMultiplier();
+		else
+			return -1;
+
+		int enchantmentBonus = 0;
+
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.EFFICIENCY, stack) * 3;
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.FORTUNE, stack);
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.MENDING, stack);
+		enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
+
+		return speed * 5 + enchantmentBonus;
+	}
+
+	public AbstractMap.SimpleEntry<Map<MCTool, Integer>, Map<MCTool, Float>> getBestTools() {
+		Map<AutoToolHack.MCTool, Integer> bestToolsSlots = new HashMap<>();
+		Map<AutoToolHack.MCTool, Float> bestToolsValues = new HashMap<>();
+
+		for (int slot = 0; slot < 36; slot++) {
+			ItemStack stack = MC.player.getInventory().getStack(slot);
+			if (stack.isEmpty()) continue;
+			Item item = stack.getItem();
+			AutoToolHack.MCTool toolType = getMCTool(item);
+			float value = getToolValue(toolType, stack, item);
+
+			if (value > bestToolsValues.getOrDefault(toolType, -1f)) {
+				bestToolsValues.put(toolType, value);
+				bestToolsSlots.put(toolType, slot);
+			}
+		}
+
+		return new AbstractMap.SimpleEntry<>(bestToolsSlots, bestToolsValues);
+	}
+
+	public enum MCTool {
+		Shovel, Pickaxe, Axe, Hoe, Null
+	}
+
+	public MCTool getMCTool(Item item)
+	{
+		MCTool toolType = MCTool.Null;
+		if (item instanceof ShovelItem) {
+			toolType = MCTool.Shovel;
+		} else if (item instanceof PickaxeItem) {
+			toolType = MCTool.Pickaxe;
+		} else if (item instanceof AxeItem) {
+			toolType = MCTool.Axe;
+		} else if (item instanceof HoeItem) {
+			toolType = MCTool.Hoe;
+		}
+
+		return toolType;
+	}
+
 }

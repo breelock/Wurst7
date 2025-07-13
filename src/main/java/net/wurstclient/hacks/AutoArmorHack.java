@@ -7,6 +7,7 @@
  */
 package net.wurstclient.hacks;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,8 +52,6 @@ public final class AutoArmorHack extends Hack
 	private final SliderSetting delay = new SliderSetting("Delay",
 		"Amount of ticks to wait before swapping the next piece of armor.", 2,
 		0, 20, 1, ValueDisplay.INTEGER);
-
-	private final CheckboxSetting dropArmor = new CheckboxSetting("Drop armor", "Throw away the worst armor", true);
 	
 	private int timer;
 	private boolean invIsOpen = false;
@@ -64,7 +63,6 @@ public final class AutoArmorHack extends Hack
 		addSetting(useEnchantments);
 		addSetting(swapWhileMoving);
 		addSetting(delay);
-		addSetting(dropArmor);
 	}
 	
 	@Override
@@ -105,40 +103,7 @@ public final class AutoArmorHack extends Hack
 			return;
 		
 		// store slots and values of best armor pieces
-		int[] bestArmorSlots = new int[4];
-		int[] bestArmorValues = new int[4];
-		
-		// initialize with currently equipped armor
-		for(int type = 0; type < 4; type++)
-		{
-			bestArmorSlots[type] = -1;
-			
-			ItemStack stack = inventory.getArmorStack(type);
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
-				continue;
-			
-			ArmorItem item = (ArmorItem)stack.getItem();
-			bestArmorValues[type] = getArmorValue(item, stack);
-		}
-		
-		// search inventory for better armor
-		for(int slot = 0; slot < 36; slot++)
-		{
-			ItemStack stack = inventory.getStack(slot);
-
-			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
-				continue;
-			
-			ArmorItem item = (ArmorItem)stack.getItem();
-			int armorType = item.getSlotType().getEntitySlotId();
-			int armorValue = getArmorValue(item, stack);
-			
-			if(armorValue > bestArmorValues[armorType])
-			{
-				bestArmorSlots[armorType] = slot;
-				bestArmorValues[armorType] = armorValue;
-			}
-		}
+		int[] bestArmorSlots = getBestArmor().getKey();
 		
 		// equip better armor in random order
 		ArrayList<Integer> types = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
@@ -168,56 +133,8 @@ public final class AutoArmorHack extends Hack
 			openServInv(false);
 			break;
 		}
-
-		// Throw away the worst armor
-		if (dropArmor.isChecked())
-		{
-			for(int slot = 9; slot < 45; slot++)
-			{
-				int adjustedSlot = slot;
-				if(adjustedSlot >= 36)
-					adjustedSlot -= 36;
-				ItemStack stack = MC.player.getInventory().getStack(adjustedSlot);
-
-				if(!stack.isEmpty())
-				{
-					if(isWorseOrSameArmor(stack))
-					{
-						openServInv(true);
-						IMC.getInteractionManager().windowClick_THROW(slot);
-						openServInv(false);
-					}
-				}
-			}
-		}
 	}
 
-	public boolean isWorseOrSameArmor(ItemStack candidate)
-	{
-		// If candidate is not armor
-		if(!(candidate.getItem() instanceof ArmorItem candidateItem))
-			return false;
-
-        var slot = candidateItem.getSlotType();
-		var player = MinecraftClient.getInstance().player;
-		if(player == null)
-			return false;
-		
-		ItemStack equipped = player.getEquippedStack(slot);
-		
-		// If nothing is equipped
-		if(equipped.isEmpty())
-			return false;
-		
-		// If equipped not an armor
-		if(!(equipped.getItem() instanceof ArmorItem equippedItem))
-			return false;
-
-        int candidateValue = getArmorValue(candidateItem, candidate);
-		int equippedValue = getArmorValue(equippedItem, equipped);
-		return candidateValue <= equippedValue;
-	}
-	
 	public int getArmorValue(ArmorItem item, ItemStack stack)
 	{
 		int baseProtection = item.getProtection();
@@ -234,6 +151,45 @@ public final class AutoArmorHack extends Hack
 			enchantmentBonus += EnchantmentHelper.getLevel(Enchantments.UNBREAKING, stack);
 		}
 		return baseProtection * 5 + enchantmentBonus;
+	}
+
+	public AbstractMap.SimpleEntry<int[], int[]> getBestArmor() {
+		int[] bestArmorSlots = new int[4];
+		int[] bestArmorValues = new int[4];
+
+		// initialize with currently equipped armor
+		for(int type = 0; type < 4; type++)
+		{
+			bestArmorSlots[type] = -1;
+
+			ItemStack stack = MC.player.getInventory().getArmorStack(type);
+			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
+				continue;
+
+			ArmorItem item = (ArmorItem)stack.getItem();
+			bestArmorValues[type] = getArmorValue(item, stack);
+		}
+
+		// search inventory for better armor
+		for(int slot = 0; slot < 36; slot++)
+		{
+			ItemStack stack = MC.player.getInventory().getStack(slot);
+
+			if(stack.isEmpty() || !(stack.getItem() instanceof ArmorItem))
+				continue;
+
+			ArmorItem item = (ArmorItem)stack.getItem();
+			int armorType = item.getSlotType().getEntitySlotId();
+			int armorValue = getArmorValue(item, stack);
+
+			if(armorValue > bestArmorValues[armorType])
+			{
+				bestArmorSlots[armorType] = slot;
+				bestArmorValues[armorType] = armorValue;
+			}
+		}
+
+		return new AbstractMap.SimpleEntry<>(bestArmorSlots, bestArmorValues);
 	}
 
 	private void openServInv(boolean open)
