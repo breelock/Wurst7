@@ -9,6 +9,7 @@ package net.wurstclient.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,27 +31,60 @@ public class MultiplayerScreenMixin extends Screen implements IMultiplayerScreen
 {
 	@Shadow
 	protected MultiplayerServerListWidget serverListWidget;
-	
+
+	private ButtonWidget lastServerButton;
+
 	private MultiplayerScreenMixin(WurstClient wurst, Text title)
 	{
 		super(title);
 	}
-	
+
+	@Inject(at = @At("TAIL"), method = "init()V")
+	private void onInit(CallbackInfo ci)
+	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return;
+
+		lastServerButton = addDrawableChild(ButtonWidget
+				.builder(Text.literal("Last Server"),
+						b -> LastServerRememberer
+								.joinLastServer((MultiplayerScreen)(Object)this))
+				.dimensions(width / 2 - 154, 10, 100, 20).build());
+		updateLastServerButton();
+	}
+
+	@Inject(at = @At("HEAD"),
+			method = "connect(Lnet/minecraft/client/network/ServerInfo;)V")
+	private void onConnect(ServerInfo entry, CallbackInfo ci)
+	{
+		LastServerRememberer.setLastServer(entry);
+		updateLastServerButton();
+	}
+
+	@Unique
+	private void updateLastServerButton()
+	{
+		if(lastServerButton == null)
+			return;
+
+		lastServerButton.active = LastServerRememberer.getLastServer() != null;
+	}
+
 	@Override
 	public MultiplayerServerListWidget getServerListSelector()
 	{
 		return serverListWidget;
 	}
-	
+
 	@Override
 	public void connectToServer(ServerInfo server)
 	{
 		connect(server);
 	}
-	
+
 	@Shadow
 	private void connect(ServerInfo entry)
 	{
-		
+
 	}
 }

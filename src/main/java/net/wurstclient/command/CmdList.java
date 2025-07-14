@@ -21,6 +21,7 @@ public final class CmdList
 	public final AnnoyCmd annoyCmd = new AnnoyCmd();
 	public final AuthorCmd authorCmd = new AuthorCmd();
 	public final BindCmd bindCmd = new BindCmd();
+	public final TestCmd testCmd = new TestCmd();
 	public final BindsCmd bindsCmd = new BindsCmd();
 	public final BlinkCmd blinkCmd = new BlinkCmd();
 	public final BlockListCmd blockListCmd = new BlockListCmd();
@@ -36,6 +37,7 @@ public final class CmdList
 	public final FeaturesCmd featuresCmd = new FeaturesCmd();
 	public final FollowCmd followCmd = new FollowCmd();
 	public final FriendsCmd friendsCmd = new FriendsCmd();
+	public final FrensCmd frensCmd = new FrensCmd();
 	public final GetPosCmd getPosCmd = new GetPosCmd();
 	public final GiveCmd giveCmd = new GiveCmd();
 	public final GmCmd gmCmd = new GmCmd();

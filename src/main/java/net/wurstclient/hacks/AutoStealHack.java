@@ -46,6 +46,10 @@ public final class AutoStealHack extends Hack
 
 	public final CheckboxSetting checkTitle =
 			new CheckboxSetting("Check chest title, if it is not default, don't steal", true);
+
+	private final SliderSetting checkDelay = new SliderSetting("Delay to ensure",
+			"Delay to ensure that the items were stolen.\n",
+			100, 0, 1000, 10, ValueDisplay.INTEGER.withSuffix("ms"));
 	
 	private Thread thread;
 	private final List<ItemStack> shit = new ArrayList<>();
@@ -60,6 +64,7 @@ public final class AutoStealHack extends Hack
 		addSetting(dontStealShit);
 		addSetting(autoClose);
 		addSetting(checkTitle);
+		addSetting(checkDelay);
 	}
 	
 	public void steal(HandledScreen<?> screen, int rows, boolean fromBtn)
@@ -89,8 +94,7 @@ public final class AutoStealHack extends Hack
 		thread.start();
 	}
 	
-	private void shiftClickSlots(HandledScreen<?> screen, int from, int to,
-		boolean steal)
+	private void shiftClickSlots(HandledScreen<?> screen, int from, int to, boolean steal)
 	{
 		shit.clear();
 		boolean isShitChest = true;
@@ -115,6 +119,9 @@ public final class AutoStealHack extends Hack
                 try {
                     if (slot.getStack().isEmpty())
                         continue;
+
+					if (MC.currentScreen != screen)
+						return;
 
                     ItemStack stack = slot.getStack();
                     Item item = stack.getItem();
@@ -165,6 +172,13 @@ public final class AutoStealHack extends Hack
                     return;
                 }
 
+			try {
+				Thread.sleep(checkDelay.getValueI());
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return;
+			}
+
             boolean allEmpty = true;
 			boolean fullEmpty = true;
 
@@ -184,7 +198,7 @@ public final class AutoStealHack extends Hack
             if (allEmpty) {
                 if (autoClose.isChecked() && MC.currentScreen == screen && !isShitChest)
                     MC.execute(() -> MC.player.closeHandledScreen());
-                break;
+                return;
             }
 			firstRun = false;
         }

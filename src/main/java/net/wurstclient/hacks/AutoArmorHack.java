@@ -54,7 +54,6 @@ public final class AutoArmorHack extends Hack
 		0, 20, 1, ValueDisplay.INTEGER);
 	
 	private int timer;
-	private boolean invIsOpen = false;
 	
 	public AutoArmorHack()
 	{
@@ -126,11 +125,11 @@ public final class AutoArmorHack extends Hack
 				slot += 36;
 			
 			// swap armor
-			openServInv(true);
+			WURST.openServInv(true);
 			if(!oldArmor.isEmpty())
 				IMC.getInteractionManager().windowClick_QUICK_MOVE(8 - type);
 			IMC.getInteractionManager().windowClick_QUICK_MOVE(slot);
-			openServInv(false);
+			WURST.openServInv(false);
 			break;
 		}
 	}
@@ -190,22 +189,6 @@ public final class AutoArmorHack extends Hack
 		}
 
 		return new AbstractMap.SimpleEntry<>(bestArmorSlots, bestArmorValues);
-	}
-
-	private void openServInv(boolean open)
-	{
-		if (MC.player == null)
-			return;
-
-		if (open && !invIsOpen) {
-			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
-			invIsOpen = true;
-		}
-
-		else if (!open && invIsOpen) {
-			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-			invIsOpen = false;
-		}
 	}
 
 	@Override

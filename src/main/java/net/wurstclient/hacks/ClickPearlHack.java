@@ -38,8 +38,6 @@ public final class ClickPearlHack extends Hack
 	private final SliderSetting maxDelay = new SliderSetting("Max delay (ms)",
 			100, 0, 1000, 1, SliderSetting.ValueDisplay.INTEGER);
 
-	private boolean invIsOpen = false;
-
 	public ClickPearlHack()
 	{
 		super("ClickPearl");
@@ -107,21 +105,5 @@ public final class ClickPearlHack extends Hack
 		}
 
 		return random.nextInt(max - min + 1) + min;
-	}
-
-	private void openServInv(boolean open)
-	{
-		if (MC.player == null)
-			return;
-
-		if (open && !invIsOpen) {
-			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
-			invIsOpen = true;
-		}
-
-		else if (!open && invIsOpen) {
-			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-			invIsOpen = false;
-		}
 	}
 }

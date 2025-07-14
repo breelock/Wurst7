@@ -22,6 +22,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
@@ -82,6 +84,7 @@ public enum WurstClient
 	public final List<SoundEvent> hitSounds = new ArrayList<>();
 	
 	private boolean enabled = true;
+	private boolean invIsOpen = false;
 	private static boolean guiInitialized;
 	private ProblematicResourcePackDetector problematicPackDetector;
 	private Path wurstFolder;
@@ -181,6 +184,22 @@ public enum WurstClient
 			SoundEvent sound = SoundEvent.of(id);
 			Registry.register(Registries.SOUND_EVENT, id, sound);
 			hitSounds.add(sound);
+		}
+	}
+
+	public void openServInv(boolean open)
+	{
+		if (MC.player == null)
+			return;
+
+		if (open && !invIsOpen) {
+			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
+			invIsOpen = true;
+		}
+
+		else if (!open && invIsOpen) {
+			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
+			invIsOpen = false;
 		}
 	}
 

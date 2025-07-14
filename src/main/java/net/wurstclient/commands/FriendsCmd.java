@@ -34,9 +34,9 @@ public class FriendsCmd extends Command
 	
 	public FriendsCmd()
 	{
-		super("frens", "Manages your frens list.", ".frens add <name>",
-			".frens remove <name>", ".frens clear", ".frens clear temp",
-			".frens list [<page>]");
+		super("friends", "Manages your frens list.", ".friends add <name>",
+			".friends remove <name>", ".friends clear", ".friends clear temp",
+			".friends list [<page>]");
 		
 		addSetting(middleClickFriends);
 	}

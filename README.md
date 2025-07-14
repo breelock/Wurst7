@@ -2,8 +2,7 @@
 
 ![Wurst Client logo](/src/main/resources/assets/wurst/wurst_128.png)
 
-The client version is designed for playing Skywars/Bedwars. But of course, you can use this client for more than just that.
-The Wurst was tested on the server “mc.dexland.org” in Skywars mode. 1150 games were played, and during that time, I never received a ban.
+The client version is designed for playing Skywars/Bedwars. But of course, you can use this client for more than just that. The Wurst was tested on the server “mc.dexland.org” in Skywars mode with my legit zxc config. 1150 games were played, and during that time, I never received a ban.
 
 - **Download:** [https://github.com/breelock/Wurst7/releases](https://github.com/breelock/Wurst7/releases)
 
@@ -22,12 +21,10 @@ The Wurst was tested on the server “mc.dexland.org” in Skywars mode. 1150 ga
 - ClickPearl
 - AutoFriends (for you minigames teammates)
 - AutoYLeave
-- AutoToolDrop
 - TimeChanger
 - HitSounds
 - RadarHack only players mode
-- AutoArmor drop worst armor
-- AutoDrop disable after drop
+- Very nice AutoDrop
 - Anti anti-cheat flag system on AutoArmor, AutoSword, AutoDrop, etc.
 - Now you can use mouse binds
 - Enhanced SafeWalk, now you can control the permitted height

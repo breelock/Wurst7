@@ -37,12 +37,8 @@ import net.wurstclient.util.ItemUtils;
 
 import java.util.AbstractMap;
 
-@SearchTags({"auto sword"})
-public final class AutoSwordHack extends Hack implements UpdateListener, PacketOutputListener
+@SearchTags({"auto sword"})public final class AutoSwordHack extends Hack implements UpdateListener, PacketOutputListener
 {
-	private final EnumSetting<Priority> priority =
-			new EnumSetting<>("Priority", Priority.values(), Priority.SPEED);
-
 	private final CheckboxSetting swapWhileMoving = new CheckboxSetting(
 			"Swap while moving",
 			"Whether or not to swap while the player is moving.\n\n"
@@ -51,7 +47,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 	
 	private final SliderSetting delay = new SliderSetting("Delay",
 		"Amount of ticks to wait before swapping.",
-		2, 1, 20, 1,
+		2, 0, 20, 1,
 		ValueDisplay.INTEGER.withSuffix(" ticks").withLabel(1, "1 tick"));
 
 	private final SliderSetting swordSlot = new SliderSetting("Sword slot",
@@ -59,7 +55,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			1, 1, 9, 1, ValueDisplay.INTEGER);
 
 	private int timer;
-	private boolean invIsOpen = false;
 	
 	public AutoSwordHack()
 	{
@@ -125,7 +120,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		int slotId = bestSwordSlot < 9 ? bestSwordSlot + 36 : bestSwordSlot;
 		Int2ObjectMap<ItemStack> stackMap = new Int2ObjectOpenHashMap<>();
 		int revision = player.currentScreenHandler.getRevision();
-		openServInv(true);
+		WURST.openServInv(true);
 		player.networkHandler.sendPacket(new ClickSlotC2SPacket(
 				0, revision, slotId, 0, SlotActionType.PICKUP,
 				player.currentScreenHandler.getSlot(slotId).getStack(), stackMap));
@@ -133,7 +128,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		player.networkHandler.sendPacket(new ClickSlotC2SPacket(
 				0, revision, swordSlot.getValueI() + 35, 0, SlotActionType.PICKUP,
 				player.currentScreenHandler.getSlot(swordSlot.getValueI() + 35).getStack(), stackMap));
-		openServInv(false);
+		WURST.openServInv(false);
 	}
 
 	public float getSwordValue(ItemStack stack, SwordItem item) {
@@ -168,22 +163,6 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 		return new AbstractMap.SimpleEntry<>(bestSwordSlot, bestSwordValue);
 	}
 
-	private void openServInv(boolean open)
-	{
-		if (MC.player == null)
-			return;
-
-		if (open && !invIsOpen) {
-			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
-			invIsOpen = true;
-		}
-
-		else if (!open && invIsOpen) {
-			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-			invIsOpen = false;
-		}
-	}
-
 	@Override
 	public void onSentPacket(PacketOutputListener.PacketOutputEvent event)
 	{
@@ -191,88 +170,7 @@ public final class AutoSwordHack extends Hack implements UpdateListener, PacketO
 			timer = delay.getValueI();
 	}
 
-	public void setSlot(Entity entity)
-	{
-		// check if active
-		if(!isEnabled())
-			return;
+	public void setSlot(Entity entity) {
 
-		// wait for AutoEat
-		if(WURST.getHax().autoEatHack.isEating())
-			return;
-
-		// find best weapon
-		float bestValue = Integer.MIN_VALUE;
-		int bestSlot = -1;
-		for(int i = 0; i < 9; i++)
-		{
-			// skip empty slots
-			if(MC.player.getInventory().getStack(i).isEmpty())
-				continue;
-
-			// get weapon value
-			ItemStack stack = MC.player.getInventory().getStack(i);
-			float value = getValue(stack, entity);
-
-			// compare with previous best weapon
-			if(value > bestValue)
-			{
-				bestValue = value;
-				bestSlot = i;
-			}
-		}
-
-		// check if any weapon was found
-		if(bestSlot == -1)
-			return;
-
-		// set slot
-		MC.player.getInventory().selectedSlot = bestSlot;
-	}
-
-	private float getValue(ItemStack stack, Entity entity)
-	{
-		Item item = stack.getItem();
-		if(!(item instanceof ToolItem || item instanceof TridentItem))
-			return Integer.MIN_VALUE;
-
-		switch(priority.getSelected())
-		{
-			case SPEED:
-				return ItemUtils.getAttackSpeed(item);
-
-			case DAMAGE:
-				EntityGroup group = entity instanceof LivingEntity le
-						? le.getGroup() : EntityGroup.DEFAULT;
-				float dmg = EnchantmentHelper.getAttackDamage(stack, group);
-				if(item instanceof SwordItem sword)
-					dmg += sword.getAttackDamage();
-				if(item instanceof MiningToolItem tool)
-					dmg += tool.getAttackDamage();
-				if(item instanceof TridentItem)
-					dmg += TridentItem.ATTACK_DAMAGE;
-				return dmg;
-		}
-
-		return Integer.MIN_VALUE;
-	}
-
-	private enum Priority
-	{
-		SPEED("Speed (swords)"),
-		DAMAGE("Damage (axes)");
-
-		private final String name;
-
-		private Priority(String name)
-		{
-			this.name = name;
-		}
-
-		@Override
-		public String toString()
-		{
-			return name;
-		}
 	}
 }

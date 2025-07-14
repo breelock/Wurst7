@@ -51,7 +51,6 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			0, 20, 1, SliderSetting.ValueDisplay.INTEGER);
 
 	private boolean isDropped = false;
-	private boolean invIsOpen = false;
 	private int timer;
 	
 	public AutoDropHack()
@@ -106,14 +105,6 @@ public final class AutoDropHack extends Hack implements UpdateListener
 			return;
 		}
 
-		if(MC.currentScreen instanceof HandledScreen
-			&& !(MC.currentScreen instanceof InventoryScreen))
-			return;
-		
-		if(MC.player.input.movementForward != 0
-			|| MC.player.input.movementSideways != 0)
-			return;
-
 		AutoSwordHack swordH = WurstClient.INSTANCE.getHax().autoSwordHack;
 		AutoArmorHack armorH = WurstClient.INSTANCE.getHax().autoArmorHack;
 		AutoToolHack toolDH = WurstClient.INSTANCE.getHax().autoToolHack;
@@ -124,6 +115,12 @@ public final class AutoDropHack extends Hack implements UpdateListener
 
 		for(int slot = 9; slot < 45; slot++)
 		{
+			if(MC.currentScreen instanceof HandledScreen && !(MC.currentScreen instanceof InventoryScreen))
+				return;
+
+			if(MC.player.input.movementForward != 0 || MC.player.input.movementSideways != 0)
+				return;
+
 			int adjustedSlot = slot;
 			if(adjustedSlot >= 36)
 				adjustedSlot -= 36;
@@ -172,25 +169,9 @@ public final class AutoDropHack extends Hack implements UpdateListener
 
 	private void drop(int slot)
 	{
-		openServInv(true);
+		WURST.openServInv(true);
 		IMC.getInteractionManager().windowClick_THROW(slot);
-		openServInv(false);
+		WURST.openServInv(false);
 		timer = delay.getValueI();
-	}
-
-	private void openServInv(boolean open)
-	{
-		if (MC.player == null)
-			return;
-
-		if (open && !invIsOpen) {
-			MC.player.networkHandler.sendPacket(new ClientCommandC2SPacket(MC.player, ClientCommandC2SPacket.Mode.OPEN_INVENTORY));
-			invIsOpen = true;
-		}
-
-		else if (!open && invIsOpen) {
-			MC.player.networkHandler.sendPacket(new CloseHandledScreenC2SPacket(MC.player.currentScreenHandler.syncId));
-			invIsOpen = false;
-		}
 	}
 }
