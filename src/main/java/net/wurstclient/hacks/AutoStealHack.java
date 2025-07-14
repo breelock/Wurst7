@@ -22,16 +22,20 @@ import net.wurstclient.hack.Hack;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.util.Rand;
 
 @SearchTags({"auto steal", "ChestStealer", "chest stealer",
 	"steal store buttons", "Steal/Store buttons"})
 public final class AutoStealHack extends Hack
 {
-	private final SliderSetting delay = new SliderSetting("Delay",
-		"Delay between moving stacks of items.\n"
-			+ "Should be at least 70ms for NoCheat+ servers.",
-		100, 0, 500, 10, ValueDisplay.INTEGER.withSuffix("ms"));
-	
+	private final SliderSetting minDelay = new SliderSetting("Min delay",
+			"Minimal delay between moving stacks of items.",
+			110, 0, 500, 10, ValueDisplay.INTEGER.withSuffix("ms"));
+
+	private final SliderSetting maxDelay = new SliderSetting("Max delay",
+		"Maximal delay between moving stacks of items.",
+		150, 0, 500, 10, ValueDisplay.INTEGER.withSuffix("ms"));
+
 	private final CheckboxSetting buttons =
 		new CheckboxSetting("Steal/Store buttons", true);
 	
@@ -58,8 +62,9 @@ public final class AutoStealHack extends Hack
 	{
 		super("AutoSteal");
 		setCategory(Category.ITEMS);
+		addSetting(minDelay);
+		addSetting(maxDelay);
 		addSetting(buttons);
-		addSetting(delay);
 		addSetting(reverseSteal);
 		addSetting(dontStealShit);
 		addSetting(autoClose);
@@ -114,6 +119,14 @@ public final class AutoStealHack extends Hack
 		int[] bestArmorValues = armorH.getBestArmor().getValue();
 		Map<AutoToolHack.MCTool, Float> bestToolsValues = toolDH.getBestTools().getValue();
 
+		if (minDelay.getValueI() > maxDelay.getValueI()) {
+			int mind = minDelay.getValueI();
+			int maxd = maxDelay.getValueI();
+
+			maxDelay.setValue(mind);
+			minDelay.setValue(maxd);
+		}
+
         while (MC.currentScreen == screen) {
             for (Slot slot : slots)
                 try {
@@ -159,7 +172,7 @@ public final class AutoStealHack extends Hack
 						}
                     }
 
-                    Thread.sleep(delay.getValueI());
+					Thread.sleep(Rand.Int(minDelay.getValueI(), maxDelay.getValueI()));
 
 					if (MC.currentScreen != screen)
 						return;

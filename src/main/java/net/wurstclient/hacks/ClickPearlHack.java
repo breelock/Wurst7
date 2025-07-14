@@ -8,26 +8,14 @@
 package net.wurstclient.hacks;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
-import net.wurstclient.events.UpdateListener;
 import net.wurstclient.hack.Hack;
-import net.wurstclient.settings.CheckboxSetting;
-import net.wurstclient.settings.ItemListSetting;
 import net.wurstclient.settings.SliderSetting;
-
-import java.util.Random;
+import net.wurstclient.util.Rand;
 
 @SearchTags({"pearl", "click pearl"})
 public final class ClickPearlHack extends Hack
@@ -72,7 +60,7 @@ public final class ClickPearlHack extends Hack
 					if (currentSlot != i) {
 						client.player.getInventory().selectedSlot = i;
 						if (!skipSleep) {
-							try {Thread.sleep(randint(minDelay.getValueI(), maxDelay.getValueI()));} catch (InterruptedException ignored) {}
+							try {Thread.sleep(Rand.Int(minDelay.getValueI(), maxDelay.getValueI()));} catch (InterruptedException ignored) {}
 						}
 					}
 
@@ -81,7 +69,7 @@ public final class ClickPearlHack extends Hack
 
 					if (currentSlot != i) {
 						if (!skipSleep) {
-							try {Thread.sleep(randint(minDelay.getValueI(), maxDelay.getValueI()));} catch (InterruptedException ignored) {}
+							try {Thread.sleep(Rand.Int(minDelay.getValueI(), maxDelay.getValueI()));} catch (InterruptedException ignored) {}
 						}
 						client.player.getInventory().selectedSlot = currentSlot;
 					}
@@ -90,20 +78,5 @@ public final class ClickPearlHack extends Hack
 			}
 			this.setEnabled(false);
 		}).start();
-	}
-
-	private final Random random = new Random();
-
-	private int randint(int min, int max) {
-		if (min == max)
-			return min;
-
-		if (min > max) {
-			min = min + max;
-			max = min - max;
-			min = min - max;
-		}
-
-		return random.nextInt(max - min + 1) + min;
 	}
 }
