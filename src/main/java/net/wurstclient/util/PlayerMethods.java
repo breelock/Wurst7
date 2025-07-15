@@ -1,6 +1,7 @@
 package net.wurstclient.util;
 
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -8,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -18,6 +20,8 @@ import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
 import net.wurstclient.hacks.AutoClickerLeftHack;
 import net.wurstclient.hacks.AutoClickerRightHack;
+
+import java.util.Set;
 
 public class PlayerMethods {
     public static void attack(MinecraftClient client, boolean isNewPvP) {
@@ -102,6 +106,14 @@ public class PlayerMethods {
                         if (PlayerMethods.interactEntity(client, hand)) return;
                     }
                     else if (client.crosshairTarget.getType() == HitResult.Type.BLOCK && !hack.dontInteractWithBlocks.isChecked()) {
+                        if (hack.dontInteractWithInteractiveBlocks.isChecked()) {
+                            BlockHitResult blockHit = (BlockHitResult) client.crosshairTarget;
+                            Block block = client.world.getBlockState(blockHit.getBlockPos()).getBlock();
+
+                            if (INTERACTIVE_BLOCKS.contains(block.getClass()))
+                                return;
+                        }
+
                         if (PlayerMethods.interactBlock(client, hand)) return;
                     }
 
@@ -243,4 +255,12 @@ public class PlayerMethods {
             }
         }
     }
+
+    private static final Set<Class<? extends Block>> INTERACTIVE_BLOCKS = Set.of(
+            AnvilBlock.class, BarrelBlock.class, BeaconBlock.class, BrewingStandBlock.class, CartographyTableBlock.class, ChestBlock.class,
+            CraftingTableBlock.class, EnchantingTableBlock.class, EnderChestBlock.class, FurnaceBlock.class, BlastFurnaceBlock.class,
+            SmokerBlock.class, GrindstoneBlock.class, LecternBlock.class, LoomBlock.class, ShulkerBoxBlock.class, SignBlock.class,
+            HangingSignBlock.class, SmithingTableBlock.class, StonecutterBlock.class
+    );
+
 }

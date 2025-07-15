@@ -42,9 +42,6 @@ public final class AutoStealHack extends Hack
 	private final CheckboxSetting reverseSteal =
 		new CheckboxSetting("Reverse steal order", false);
 
-	private final CheckboxSetting dontStealShit =
-			new CheckboxSetting("Don't steal shit", true);
-
 	private final CheckboxSetting autoClose =
 			new CheckboxSetting("Auto close chest after steal", true);
 
@@ -54,6 +51,11 @@ public final class AutoStealHack extends Hack
 	private final SliderSetting checkDelay = new SliderSetting("Delay to ensure",
 			"Delay to ensure that the items were stolen.\n",
 			100, 0, 1000, 10, ValueDisplay.INTEGER.withSuffix("ms"));
+
+	private final CheckboxSetting dontStealShit = new CheckboxSetting("Don't steal shit", true);
+	private final CheckboxSetting dontStealSwords = new CheckboxSetting("Don't steal worst swords", "Throw away the worst swords", true);
+	private final CheckboxSetting dontStealArmor = new CheckboxSetting("Don't steal worst armor", "Throw away the worst armor", true);
+	private final CheckboxSetting dontStealTools = new CheckboxSetting("Don't steal worst tools", "Throw away the worst tools", true);
 	
 	private Thread thread;
 	private final List<ItemStack> shit = new ArrayList<>();
@@ -66,10 +68,13 @@ public final class AutoStealHack extends Hack
 		addSetting(maxDelay);
 		addSetting(buttons);
 		addSetting(reverseSteal);
-		addSetting(dontStealShit);
 		addSetting(autoClose);
 		addSetting(checkTitle);
 		addSetting(checkDelay);
+		addSetting(dontStealShit);
+		addSetting(dontStealSwords);
+		addSetting(dontStealArmor);
+		addSetting(dontStealTools);
 	}
 	
 	public void steal(HandledScreen<?> screen, int rows, boolean fromBtn)
@@ -140,29 +145,29 @@ public final class AutoStealHack extends Hack
                     Item item = stack.getItem();
                     String itemName = Registries.ITEM.getId(item).toString();
 
-                    if (dontStealShit.isChecked()) {
-                        if (dropH.items.getItemNames().contains(itemName)) {
-                            shit.add(stack);
-                            continue;
-                        }
+					if (dontStealShit.isChecked() && dropH.items.getItemNames().contains(itemName)) {
+						shit.add(stack);
+						continue;
+					}
 
-                        if (item instanceof SwordItem sword) {
-                            if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
-                                shit.add(stack);
-                                continue;
-                            }
-                        }
+					if (dontStealSwords.isChecked() && item instanceof SwordItem sword) {
+						if (swordH.getSwordValue(stack, sword) <= bestSwordValue) {
+							shit.add(stack);
+							continue;
+						}
+					}
 
-                        if (item instanceof ArmorItem armorItem) {
-                            int armorType = armorItem.getSlotType().getEntitySlotId();
-                            int armorValue = armorH.getArmorValue(armorItem, stack);
+					if (dontStealArmor.isChecked() && item instanceof ArmorItem armorItem) {
+						int armorType = armorItem.getSlotType().getEntitySlotId();
+						int armorValue = armorH.getArmorValue(armorItem, stack);
 
-                            if (armorValue <= bestArmorValues[armorType]) {
-                                shit.add(stack);
-                                continue;
-                            }
-                        }
+						if (armorValue <= bestArmorValues[armorType]) {
+							shit.add(stack);
+							continue;
+						}
+					}
 
+					if (dontStealTools.isChecked()) {
 						AutoToolHack.MCTool toolT = toolDH.getMCTool(item);
 						if (toolT != AutoToolHack.MCTool.Null) {
 							if (toolDH.getToolValue(toolT, stack, item) <= (bestToolsValues.get(toolT) == null ? -1 : bestToolsValues.get(toolT))) {
@@ -170,7 +175,7 @@ public final class AutoStealHack extends Hack
 								continue;
 							}
 						}
-                    }
+					}
 
 					Thread.sleep(Rand.Int(minDelay.getValueI(), maxDelay.getValueI()));
 

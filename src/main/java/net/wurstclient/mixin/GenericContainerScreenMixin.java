@@ -7,7 +7,6 @@
  */
 package net.wurstclient.mixin;
 
-import net.wurstclient.util.ChatUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

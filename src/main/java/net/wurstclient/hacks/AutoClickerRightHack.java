@@ -36,6 +36,9 @@ public final class AutoClickerRightHack extends Hack implements UpdateListener
 	public final CheckboxSetting dontInteractWithBlocks = new CheckboxSetting(
 			"Don't interact with blocks", "Don't interact with blocks.", false);
 
+	public final CheckboxSetting dontInteractWithInteractiveBlocks = new CheckboxSetting(
+			"Don't interact with interactive blocks", "Don't interact with interactive blocks (crafting table, chest, etc.).", false);
+
 	public final CheckboxSetting dontInteractWithItems = new CheckboxSetting(
 			"Don't interact with items", "Don't interact with items.", false);
 
@@ -46,6 +49,7 @@ public final class AutoClickerRightHack extends Hack implements UpdateListener
 		addSetting(showMessage);
 		addSetting(dontInteractWithEntities);
 		addSetting(dontInteractWithBlocks);
+		addSetting(dontInteractWithInteractiveBlocks);
 		addSetting(dontInteractWithItems);
 		addSetting(minDelay);
 		addSetting(maxDelay);

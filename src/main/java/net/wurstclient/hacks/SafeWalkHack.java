@@ -7,7 +7,11 @@
  */
 package net.wurstclient.hacks;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
 import net.wurstclient.Category;
 import net.wurstclient.SearchTags;
 import net.wurstclient.hack.Hack;
@@ -33,6 +37,11 @@ public final class SafeWalkHack extends Hack
 			"Permitted height",
 			"Permitted height",
 			5, 0, 100, 1, ValueDisplay.DECIMAL);
+
+	private final SliderSetting altPermittedHeight = new SliderSetting(
+			"Alt Permitted height",
+			"Permitted height for walking backward or sideways",
+			1, 0, 100, 1, ValueDisplay.DECIMAL);
 	
 	private boolean sneaking;
 
@@ -43,6 +52,7 @@ public final class SafeWalkHack extends Hack
 		addSetting(sneak);
 		addSetting(edgeDistance);
 		addSetting(permittedHeight);
+		addSetting(altPermittedHeight);
 	}
 
 	@Override
@@ -79,11 +89,36 @@ public final class SafeWalkHack extends Hack
 		if (!isEnabled())
 			return false;
 
+		ClientPlayerEntity player = MC.player;
+		if (player == null)
+			return false;
+
+		float input = player.input == null ? 0f : player.input.movementForward;
+
+		double adjustedPermittedHeight = (input == 1)
+				? permittedHeight.getValue()
+				: altPermittedHeight.getValue();
+
 		Box adjustedBox = MC.player.getBoundingBox().stretch(0, -MC.player.stepHeight, 0)
 				.expand(-edgeDistance.getValue(), 0, -edgeDistance.getValue())
-				.stretch(0, -permittedHeight.getValue(), 0);
+				.stretch(0, -adjustedPermittedHeight, 0);
 
-		return MC.world.isSpaceEmpty(MC.player, adjustedBox);
+		return !intersectsAnyCollision(adjustedBox);
+	}
+
+	private boolean intersectsAnyCollision(Box box) {
+		for (BlockPos pos : BlockPos.iterate(
+				BlockPos.ofFloored(box.minX, box.minY, box.minZ),
+				BlockPos.ofFloored(box.maxX, box.maxY, box.maxZ))) {
+
+			BlockState state = MC.world.getBlockState(pos);
+			VoxelShape shape = state.getCollisionShape(MC.world, pos);
+
+			if (!shape.isEmpty() && shape.getBoundingBox().offset(pos).intersects(box))
+				return true;
+		}
+
+		return false;
 	}
 
 	private void setSneaking(boolean sneaking)
@@ -97,6 +132,6 @@ public final class SafeWalkHack extends Hack
 		
 		this.sneaking = sneaking;
 	}
-	
+
 	// See ClientPlayerEntityMixin
 }
